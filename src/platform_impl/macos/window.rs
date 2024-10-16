@@ -689,7 +689,7 @@ impl UnownedWindow {
     let scale_factor = self.scale_factor();
     let position = position.to_logical(scale_factor);
     unsafe {
-      util::set_frame_top_left_point_async(*self.ns_window, util::window_position(position));
+      util::set_frame_top_left_point_sync(*self.ns_window, util::window_position(position));
     }
   }
 
