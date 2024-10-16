@@ -715,7 +715,7 @@ impl UnownedWindow {
   pub fn set_inner_size(&self, size: Size) {
     unsafe {
       let scale_factor = self.scale_factor();
-      util::set_content_size_async(*self.ns_window, size.to_logical(scale_factor));
+      util::set_content_size_sync(*self.ns_window, size.to_logical(scale_factor));
     }
   }
 

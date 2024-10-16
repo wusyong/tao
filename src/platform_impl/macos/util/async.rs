@@ -90,6 +90,17 @@ pub unsafe fn set_content_size_async(ns_window: id, size: LogicalSize<f64>) {
   });
 }
 
+pub unsafe fn set_content_size_sync(ns_window: id, size: LogicalSize<f64>) {
+  if is_main_thread() {
+    ns_window.setContentSize_(NSSize::new(size.width as CGFloat, size.height as CGFloat));
+  } else {
+    let ns_window = MainThreadSafe(ns_window);
+    Queue::main().exec_sync(move || {
+      ns_window.setContentSize_(NSSize::new(size.width as CGFloat, size.height as CGFloat));
+    });
+  }
+}
+
 // `setFrameTopLeftPoint:` isn't thread-safe, but fortunately has the courtesy
 // to log errors.
 pub unsafe fn set_frame_top_left_point_async(ns_window: id, point: NSPoint) {
