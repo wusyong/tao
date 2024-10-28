@@ -500,7 +500,7 @@ impl UnownedWindow {
 
     unsafe {
       if win_attribs.transparent {
-        let color = ns_window.setOpaque_(NO);
+        ns_window.setOpaque_(NO);
       }
 
       if win_attribs.transparent || win_attribs.background_color.is_some() {
@@ -516,7 +516,7 @@ impl UnownedWindow {
             )
           })
           .unwrap_or_else(|| NSColor::clearColor(nil));
-        ns_window.setBackgroundColor_(NSColor::clearColor(nil));
+        ns_window.setBackgroundColor_(color);
       }
 
       if win_attribs.inner_size_constraints.has_min() {
