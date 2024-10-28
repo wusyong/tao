@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.30.4]
+
+- [`b404cde1`](https://github.com/tauri-apps/tao/commit/b404cde150eb767026122691aed2d21f9d6fd051) ([#995](https://github.com/tauri-apps/tao/pull/995) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) Add `WindowAttributes::background_color`, `WindowBuilder::with_background_color`, and `Window::set_background_color` APIs to set and change window background color.
+
 ## \[0.30.3]
 
 - [`4dcd2312`](https://github.com/tauri-apps/tao/commit/4dcd231209db80a49b3403c01966026cee975b00) ([#979](https://github.com/tauri-apps/tao/pull/979) by [@Zamoca42](https://github.com/tauri-apps/tao/../../Zamoca42)) On Linux Wayland, changed the event handling for maximizing to process events sequentially to avoid "Error 71(Protocol error): dispatching to Wayland display".
