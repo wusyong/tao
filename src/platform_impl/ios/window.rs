@@ -363,6 +363,8 @@ impl Inner {
     warn!("`Window::request_user_attention` is ignored on iOS")
   }
 
+  pub fn set_background_color(&self, _color: Option<crate::window::RGBA>) {}
+
   // Allow directly accessing the current monitor internally without unwrapping.
   fn current_monitor_inner(&self) -> RootMonitorHandle {
     unsafe {

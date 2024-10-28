@@ -51,7 +51,7 @@ use crate::{
   },
   window::{
     CursorIcon, Fullscreen, ProgressBarState, ProgressState, ResizeDirection, Theme,
-    UserAttentionType, WindowAttributes, WindowSizeConstraints,
+    UserAttentionType, WindowAttributes, WindowSizeConstraints, RGBA,
   },
 };
 
@@ -983,6 +983,16 @@ impl Window {
   }
 
   #[inline]
+  pub fn set_background_color(&self, color: Option<RGBA>) {
+    self.window_state.lock().background_color = color;
+
+    unsafe {
+      let _ = InvalidateRect(self.hwnd(), None, true);
+      let _ = UpdateWindow(self.hwnd());
+    }
+  }
+
+  #[inline]
   pub fn set_progress_bar(&self, progress: ProgressBarState) {
     unsafe {
       let taskbar_list: ITaskbarList = CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap();
@@ -1176,6 +1186,7 @@ unsafe fn init<T: 'static>(
       scale_factor,
       current_theme,
       attributes.preferred_theme,
+      attributes.background_color,
     );
     let window_state = Arc::new(Mutex::new(window_state));
     WindowState::set_window_flags(window_state.lock(), real_window.0, |f| *f = window_flags);

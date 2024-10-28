@@ -16,7 +16,7 @@ use gtk::{
   gdk::WindowState,
   glib::{self, translate::ToGlibPtr},
   prelude::*,
-  Settings,
+  CssProvider, Settings,
 };
 
 use crate::{
@@ -27,7 +27,7 @@ use crate::{
   platform_impl::wayland::header::WlHeader,
   window::{
     CursorIcon, Fullscreen, ProgressBarState, ResizeDirection, Theme, UserAttentionType,
-    WindowAttributes, WindowSizeConstraints,
+    WindowAttributes, WindowSizeConstraints, RGBA,
   },
 };
 
@@ -69,6 +69,7 @@ pub struct Window {
   /// Draw event Sender
   draw_tx: crossbeam_channel::Sender<WindowId>,
   preferred_theme: RefCell<Option<Theme>>,
+  css_provider: CssProvider,
 }
 
 impl Window {
@@ -324,9 +325,11 @@ impl Window {
       fullscreen: RefCell::new(attributes.fullscreen),
       inner_size_constraints: RefCell::new(attributes.inner_size_constraints),
       preferred_theme: RefCell::new(preferred_theme),
+      css_provider: CssProvider::new(),
     };
 
-    win.set_skip_taskbar(pl_attribs.skip_taskbar);
+    let _ = win.set_skip_taskbar(pl_attribs.skip_taskbar);
+    win.set_background_color(attributes.background_color);
 
     Ok(win)
   }
@@ -407,6 +410,7 @@ impl Window {
       fullscreen: RefCell::new(None),
       inner_size_constraints: RefCell::new(WindowSizeConstraints::default()),
       preferred_theme: RefCell::new(None),
+      css_provider: CssProvider::new(),
     };
 
     Ok(win)
@@ -453,6 +457,15 @@ impl Window {
       .send((self.window_id, WindowRequest::Position((x, y))))
     {
       log::warn!("Fail to send position request: {}", e);
+    }
+  }
+
+  pub fn set_background_color(&self, color: Option<RGBA>) {
+    if let Err(e) = self.window_requests_tx.send((
+      self.window_id,
+      WindowRequest::BackgroundColor(self.css_provider.clone(), color),
+    )) {
+      log::warn!("Fail to send size request: {}", e);
     }
   }
 
@@ -1029,6 +1042,7 @@ pub enum WindowRequest {
   SetVisibleOnAllWorkspaces(bool),
   ProgressBarState(ProgressBarState),
   SetTheme(Option<Theme>),
+  BackgroundColor(CssProvider, Option<RGBA>),
 }
 
 impl Drop for Window {

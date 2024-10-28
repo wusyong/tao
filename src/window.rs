@@ -85,6 +85,11 @@ impl Drop for Window {
   }
 }
 
+/// Type alias for a color in the RGBA format.
+///
+/// Each value can be 0..255 inclusive.
+pub type RGBA = (u8, u8, u8, u8);
+
 /// Identifier of a window. Unique for each window.
 ///
 /// Can be obtained with `window.id()`.
@@ -257,6 +262,14 @@ pub struct WindowAttributes {
   ///
   /// - **iOS / Android / Windows:** Unsupported.
   pub visible_on_all_workspaces: bool,
+
+  /// Sets the window background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows:** alpha channel is ignored. Instead manually draw the window, for example using `softbuffer` crate, see <https://github.com/tauri-apps/tao/blob/dev/examples/transparent.rs>
+  /// - **iOS / Android:** Unsupported.
+  pub background_color: Option<RGBA>,
 }
 
 impl Default for WindowAttributes {
@@ -283,6 +296,7 @@ impl Default for WindowAttributes {
       focused: true,
       content_protection: false,
       visible_on_all_workspaces: false,
+      background_color: None,
     }
   }
 }
@@ -543,6 +557,18 @@ impl WindowBuilder {
   #[inline]
   pub fn with_visible_on_all_workspaces(mut self, visible: bool) -> WindowBuilder {
     self.window.visible_on_all_workspaces = visible;
+    self
+  }
+
+  /// Sets the window background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows:** alpha channel is ignored. Instead manually draw the window, for example using `softbuffer` crate, see <https://github.com/tauri-apps/tao/blob/dev/examples/transparent.rs>
+  /// - **iOS / Android:** Unsupported.
+  #[inline]
+  pub fn with_background_color(mut self, color: RGBA) -> WindowBuilder {
+    self.window.background_color = Some(color);
     self
   }
 
@@ -1154,6 +1180,17 @@ impl Window {
   pub fn set_visible_on_all_workspaces(&self, #[allow(unused)] visible: bool) {
     #[cfg(any(target_os = "macos", target_os = "linux"))]
     self.window.set_visible_on_all_workspaces(visible)
+  }
+
+  /// Sets the window background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows:** alpha channel is ignored. Instead manually draw the window, for example using `softbuffer` crate, see <https://github.com/tauri-apps/tao/blob/dev/examples/transparent.rs>
+  /// - **iOS / Android:** Unsupported.
+  #[inline]
+  pub fn set_background_color(&self, color: Option<RGBA>) {
+    self.window.set_background_color(color)
   }
 }
 

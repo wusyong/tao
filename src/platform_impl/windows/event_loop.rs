@@ -1113,6 +1113,25 @@ unsafe fn public_window_callback_inner<T: 'static>(
       }
     }
 
+    win32wm::WM_ERASEBKGND => {
+      let w = subclass_input.window_state.lock();
+      if let Some(color) = w.background_color {
+        let hdc = HDC(wparam.0 as *mut _);
+        let mut rc = RECT::default();
+        if GetClientRect(window, &mut rc).is_ok() {
+          let brush = CreateSolidBrush(util::RGB(color.0, color.1, color.2));
+          FillRect(hdc, &rc, brush);
+          let _ = DeleteObject(brush);
+
+          result = ProcResult::Value(LRESULT(1));
+        } else {
+          result = ProcResult::DefSubclassProc;
+        }
+      } else {
+        result = ProcResult::DefSubclassProc;
+      }
+    }
+
     win32wm::WM_WINDOWPOSCHANGING => {
       let mut window_state = subclass_input.window_state.lock();
 

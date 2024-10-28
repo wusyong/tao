@@ -683,6 +683,8 @@ impl Window {
     ))
   }
 
+  pub fn set_background_color(&self, _color: Option<crate::window::RGBA>) {}
+
   pub fn set_ignore_cursor_events(&self, _ignore: bool) -> Result<(), error::ExternalError> {
     Err(error::ExternalError::NotSupported(
       error::NotSupportedError::new(),

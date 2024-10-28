@@ -20,7 +20,7 @@ use crate::{
 use windows::{
   core::{HRESULT, PCSTR, PCWSTR},
   Win32::{
-    Foundation::{BOOL, FARPROC, HWND, LPARAM, LRESULT, POINT, RECT, WPARAM},
+    Foundation::{BOOL, COLORREF, FARPROC, HWND, LPARAM, LRESULT, POINT, RECT, WPARAM},
     Globalization::lstrlenW,
     Graphics::Gdi::{ClientToScreen, InvalidateRgn, HMONITOR, HRGN},
     System::LibraryLoader::*,
@@ -391,6 +391,13 @@ pub fn GET_XBUTTON_WPARAM(wparam: WPARAM) -> u16 {
 #[inline]
 pub fn PRIMARYLANGID(hkl: HKL) -> u32 {
   ((hkl.0 as usize) & 0x3FF) as u32
+}
+
+/// Implementation of the `RGB` macro.
+#[allow(non_snake_case)]
+#[inline]
+pub fn RGB<T: Into<u32>>(r: T, g: T, b: T) -> COLORREF {
+  COLORREF(r.into() | g.into() << 8 | b.into() << 16)
 }
 
 pub unsafe extern "system" fn call_default_window_proc(

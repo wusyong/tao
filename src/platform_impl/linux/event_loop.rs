@@ -368,6 +368,28 @@ impl<T: 'static> EventLoop<T> {
             window.set_skip_taskbar_hint(skip);
             window.set_skip_pager_hint(skip)
           }
+          WindowRequest::BackgroundColor(css_provider, color) => {
+            unsafe { window.set_data("background_color", color) };
+
+            let style_context = window.style_context();
+            style_context.remove_provider(&css_provider);
+
+            if let Some(color) = color {
+              let theme = format!(
+                r#"
+                  window {{
+                    background-color:  rgba({},{},{},{});
+                    }}
+                    "#,
+                color.0,
+                color.1,
+                color.2,
+                color.3 as f64 / 255.0
+              );
+              let _ = css_provider.load_from_data(theme.as_bytes());
+              style_context.add_provider(&css_provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+            };
+          }
           WindowRequest::SetVisibleOnAllWorkspaces(visible) => {
             if visible {
               window.stick();
@@ -854,15 +876,36 @@ impl<T: 'static> EventLoop<T> {
 
             // Receive draw events of the window.
             let draw_clone = draw_tx.clone();
-            window.connect_draw(move |_, cr| {
+            window.connect_draw(move |window, cr| {
               if let Err(e) = draw_clone.send(id) {
                 log::warn!("Failed to send redraw event to event channel: {}", e);
               }
 
               if transparent {
-                cr.set_source_rgba(0., 0., 0., 0.);
+                let background_color = unsafe {
+                  window
+                    .data::<Option<crate::window::RGBA>>("background_color")
+                    .and_then(|c| c.as_ref().clone())
+                };
+
+                let rgba = background_color
+                  .map(|(r, g, b, a)| (r as f64, g as f64, b as f64, a as f64 / 255.0))
+                  .unwrap_or((0., 0., 0., 0.));
+
+                let rect = window
+                  .child()
+                  .map(|c| c.allocation())
+                  .unwrap_or_else(|| window.allocation());
+
+                cr.rectangle(
+                  rect.x() as _,
+                  rect.y() as _,
+                  rect.width() as _,
+                  rect.height() as _,
+                );
+                cr.set_source_rgba(rgba.0, rgba.1, rgba.2, rgba.3);
                 cr.set_operator(cairo::Operator::Source);
-                let _ = cr.paint();
+                let _ = cr.fill();
                 cr.set_operator(cairo::Operator::Over);
               }
 
