@@ -197,6 +197,24 @@ impl Window {
   }
 
   #[inline]
+  pub(crate) fn request_nccalcsize(&self) {
+    unsafe {
+      let mut rect = RECT::default();
+      if GetWindowRect(self.window.0, &mut rect).is_ok() {
+        let _ = SetWindowPos(
+          self.window.0,
+          HWND::default(),
+          rect.left,
+          rect.top,
+          rect.right - rect.left,
+          rect.bottom - rect.top,
+          SWP_FRAMECHANGED,
+        );
+      }
+    }
+  }
+
+  #[inline]
   pub fn outer_position(&self) -> Result<PhysicalPosition<i32>, NotSupportedError> {
     unsafe { util::get_window_rect(self.window.0) }
       .map(|rect| Ok(PhysicalPosition::new(rect.left, rect.top)))

@@ -23,7 +23,8 @@ use windows::{
   core::{s, PCWSTR},
   Win32::{
     Foundation::{
-      BOOL, HANDLE, HINSTANCE, HMODULE, HWND, LPARAM, LRESULT, POINT, RECT, WAIT_TIMEOUT, WPARAM,
+      BOOL, FALSE, HANDLE, HINSTANCE, HMODULE, HWND, LPARAM, LRESULT, POINT, RECT, WAIT_TIMEOUT,
+      WPARAM,
     },
     Graphics::Gdi::*,
     System::{
@@ -2142,9 +2143,27 @@ unsafe fn public_window_callback_inner<T: 'static>(
             params.rgrc[0] = rect;
           }
         } else if window_flags.contains(WindowFlags::MARKER_UNDECORATED_SHADOW) {
+          let mut rect = RECT::default();
+          if AdjustWindowRectEx(
+            &mut rect,
+            WINDOW_STYLE((GetWindowLongPtrW(window, GWL_STYLE) & !(WS_CAPTION.0 as isize)) as u32),
+            FALSE,
+            WINDOW_EX_STYLE::default(),
+          )
+          .is_ok()
+          {
+            rect.left *= -1;
+            rect.top *= -1;
+          } else {
+            // As a fallback value, this keeps the shadow border but disables the resizing.
+            rect.bottom = -1;
+          }
+
           let params = &mut *(lparam.0 as *mut NCCALCSIZE_PARAMS);
           params.rgrc[0].top += 1;
-          params.rgrc[0].bottom += 1;
+          params.rgrc[0].left += rect.left;
+          params.rgrc[0].right -= rect.right;
+          params.rgrc[0].bottom -= rect.bottom;
         }
         result = ProcResult::Value(LRESULT(0)); // return 0 here to make the window borderless
       }

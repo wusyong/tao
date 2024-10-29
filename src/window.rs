@@ -582,6 +582,8 @@ impl WindowBuilder {
   ) -> Result<Window, OsError> {
     platform_impl::Window::new(&window_target.p, self.window, self.platform_specific).map(
       |window| {
+        #[cfg(windows)]
+        window.request_nccalcsize();
         window.request_redraw();
         Window { window }
       },
