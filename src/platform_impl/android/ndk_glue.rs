@@ -52,7 +52,8 @@ macro_rules! android_binding {
     ::tao::android_binding!($domain, $package, $activity, $setup, $main, ::tao)
   };
   ($domain:ident, $package:ident, $activity:ident, $setup:path, $main:ident, $tao:path) => {{
-    use $tao::platform::android::prelude::{android_fn, *};
+    // NOTE: be careful when changing how this use statement is written
+    use $tao::{platform::android::prelude::android_fn, platform::android::prelude::*};
     fn _____tao_store_package_name__() {
       PACKAGE.get_or_init(move || generate_package_name!($domain, $package));
     }
