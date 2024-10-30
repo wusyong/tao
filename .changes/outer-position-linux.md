@@ -2,4 +2,4 @@
 "tao": "patch"
 ---
 
-On Linux, fix position returned in `Window::outer_position` to include border and titlebar.
+On Linux, `Window::outer_position` and `Window::outer_size` to include border and titlebar.
