@@ -255,8 +255,12 @@ impl Window {
     let size: Rc<(AtomicI32, AtomicI32)> = Rc::new((w_size.0.into(), w_size.1.into()));
     let size_clone = size.clone();
 
-    window.connect_configure_event(move |_, event| {
-      let (x, y) = event.position();
+    window.connect_configure_event(move |window, event| {
+      let (x, y) = window
+        .window()
+        .map(|w| w.root_origin())
+        .unwrap_or_else(|| event.position());
+
       position_clone.0.store(x, Ordering::Release);
       position_clone.1.store(y, Ordering::Release);
 
