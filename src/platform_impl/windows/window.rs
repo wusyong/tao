@@ -6,6 +6,7 @@
 
 use mem::MaybeUninit;
 use parking_lot::Mutex;
+use windows_core::HSTRING;
 use std::{
   cell::{Cell, RefCell},
   ffi::OsStr,
@@ -50,8 +51,7 @@ use crate::{
     OsError, Parent, PlatformSpecificWindowBuilderAttributes, WindowId,
   },
   window::{
-    CursorIcon, Fullscreen, ProgressBarState, ProgressState, ResizeDirection, Theme,
-    UserAttentionType, WindowAttributes, WindowSizeConstraints, RGBA,
+    CursorIcon, Fullscreen, ProgressBarState, ProgressState, ResizeDirection, Theme, UserAttentionType, WindowAttributes, WindowSizeConstraints, RGBA
   },
 };
 
@@ -1020,6 +1020,30 @@ impl Window {
           .SetProgressValue(handle, value, 100)
           .unwrap_or(());
       }
+    }
+  }
+
+  #[inline]
+  pub fn set_overlay_icon(&self, icon: Option<String>) {
+    let Some(icon) = icon else {
+      unsafe {
+        let taskbar_list: ITaskbarList = CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap();
+  
+        taskbar_list.SetOverlayIcon(self.window.0, None, None).unwrap();
+      }
+      return;
+    };
+
+    let image = unsafe {
+      LoadImageW(None, PCWSTR(HSTRING::from(icon).as_ptr()), IMAGE_ICON, 0, 0, IMAGE_FLAGS(0x00000040 | 0x00000010))
+    }.unwrap();
+
+    let icon = HICON(image.0);
+
+    unsafe {
+      let taskbar_list: ITaskbarList = CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap();
+
+      taskbar_list.SetOverlayIcon(self.window.0, icon, None).unwrap();
     }
   }
 

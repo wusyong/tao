@@ -1115,6 +1115,20 @@ impl Window {
     self.window.set_progress_bar(_progress)
   }
 
+    /// Sets the taskbar progress state.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux / macOS**: Not Yet Implemented.
+  /// - **iOS / Android:** Unsupported.
+  #[inline]
+  pub fn set_overlay_icon(&self, _icon: Option<String>) {
+    #[cfg(any(
+      windows
+    ))]
+    self.window.set_overlay_icon(_icon)
+  }
+
   /// Requests user attention to the window, this has no effect if the application
   /// is already focused. How requesting for user attention manifests is platform dependent,
   /// see `UserAttentionType` for details.
