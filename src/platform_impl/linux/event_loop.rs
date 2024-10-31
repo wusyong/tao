@@ -161,10 +161,10 @@ impl<T> EventLoopWindowTarget<T> {
   }
 
   #[inline]
-  pub fn set_badge_count(&self, badge: Option<i64>) {
+  pub fn set_badge_count(&self, count: Option<i64>) {
     if let Err(e) = self
       .window_requests_tx
-      .send((WindowId::dummy(), WindowRequest::BadgeCount(badge)))
+      .send((WindowId::dummy(), WindowRequest::BadgeCount(count)))
     {
       log::warn!("Fail to send update progress bar request: {e}");
     }

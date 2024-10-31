@@ -38,7 +38,7 @@ use crate::{
       util::{self, IdRef},
     },
     set_progress_indicator,
-    set_bage_count
+    set_badge_label
   },
   window::{ProgressBarState, Theme},
 };
@@ -128,7 +128,12 @@ impl<T: 'static> EventLoopWindowTarget<T> {
 
   #[inline]
   pub fn set_badge_count(&self, count: Option<i64>) {
-    set_badge_count(count);
+    set_badge_label(count.and_then(|count| Some(format!("{}", count))));
+  }
+
+  #[inline]
+  pub fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
   }
 
   #[inline]
