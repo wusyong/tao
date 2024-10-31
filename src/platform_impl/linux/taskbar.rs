@@ -124,8 +124,8 @@ impl TaskbarIndicator {
     }
   }
 
-  pub fn update_count(&mut self, count: Option<i64>) {
-    if let Some(uri) = progress.desktop_filename {
+  pub fn update_count(&mut self, count: Option<i64>, desktop_filename: Option<String>) {
+    if let Some(uri) = desktop_filename {
       self.desktop_filename = Some(uri);
     }
 

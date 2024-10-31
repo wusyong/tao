@@ -127,7 +127,7 @@ impl<T: 'static> EventLoopWindowTarget<T> {
   }
 
   #[inline]
-  pub fn set_badge_count(&self, count: Option<i64>) {
+  pub fn set_badge_count(&self, count: Option<i64>, _desktop_filename: Option<String>) {
     set_badge_label(count.and_then(|count| Some(format!("{}", count))));
   }
 

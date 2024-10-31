@@ -1117,22 +1117,27 @@ impl Window {
 
   /// Sets the badge count on the taskbar
   ///
+  /// ## Implementation Details
+  /// - _desktop_filename is for linux ONLY!
+  /// 
   /// ## Platform-specific
   ///
   /// - **Windows**: Windows allows to set an arbitrary .ico file. See set_overlay_icon
   /// - **Linux / macOS**: Badge count is app-wide and not specific to this window. Only supported desktop environments with `libunity` (e.g. GNOME).
   /// - **iOS / Android:** Unsupported.
   #[inline]
-  pub fn set_badge_count(&self, _count: Option<i64>) {
+  pub fn set_badge_count(&self, _count: Option<i64>, _desktop_filename: Option<String>) {
+    #[cfg(target_os = "macos")]
+    self.window.set_badge_count(_count);
+
     #[cfg(any(
       target_os = "linux",
       target_os = "dragonfly",
       target_os = "freebsd",
       target_os = "netbsd",
       target_os = "openbsd",
-      target_os = "macos",
     ))]
-    self.window.set_badge_count(_count)
+    self.window.set_badge_count(_count, _desktop_filename);
   }
 
   /// Sets the Overlay Icon **(Windows only)**

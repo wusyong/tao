@@ -161,10 +161,10 @@ impl<T> EventLoopWindowTarget<T> {
   }
 
   #[inline]
-  pub fn set_badge_count(&self, count: Option<i64>) {
+  pub fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) {
     if let Err(e) = self
       .window_requests_tx
-      .send((WindowId::dummy(), WindowRequest::BadgeCount(count)))
+      .send((WindowId::dummy(), WindowRequest::BadgeCount(count, desktop_filename)))
     {
       log::warn!("Fail to send update progress bar request: {e}");
     }
@@ -928,8 +928,8 @@ impl<T: 'static> EventLoop<T> {
           WindowRequest::ProgressBarState(state) => {
             taskbar.update(state);
           }
-          WindowRequest::BadgeCount(count) => {
-            taskbar.update_count(count);
+          WindowRequest::BadgeCount(count, desktop_filename) => {
+            taskbar.update_count(count, desktop_filename);
           }
           WindowRequest::SetTheme(theme) => {
             if let Some(settings) = Settings::default() {

@@ -20,7 +20,10 @@ fn main() {
   let mut modifiers = ModifiersState::default();
 
   eprintln!("Key mappings:");
+  #[cfg(windows)]
   eprintln!("  [any key]: Show the Overlay Icon");
+  #[cfg(not(windows))]
+  eprintln!("  [1-5]: Show a Badge count");
   eprintln!("  Ctrl+1: Clear");
 
   event_loop.run(move |event, _, control_flow| {
@@ -44,6 +47,21 @@ fn main() {
             },
           ..
         } => {
+          #[cfg(not(windows))]
+          if modifiers.is_empty() {
+            window.set_badge_count(Some(match key_str {
+              "1" => 1,
+              "2" => 2,
+              "3" => 3,
+              "4" => 4,
+              "5" => 5,
+              _ => 20
+            }));
+          } else if modifiers.control_key() && key_str == "1" {
+            window.set_badge_count(None);
+          }
+
+          #[cfg(windows)]
           if modifiers.is_empty() {
             let mut path = current_dir().unwrap();
             path.push("./examples/icon.ico");
