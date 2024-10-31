@@ -310,11 +310,8 @@ impl<T> EventLoopWindowTarget<T> {
   /// - **iOS / Android:** Unsupported.
   #[inline]
   pub fn set_badge_count(&self, _badge: Option<i64>, _desktop_filename: Option<String>) {
-    #[cfg(target_os = "linux")]
-    self.p.set_bage_count(_progress, _desktop_filename);
-
-    #[cfg(target_os = "macos")]
-    self.p.set_bage_count(_progress);
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    self.p.set_bage_count(_progress, _desktop_filename)
   }
 
   /// Sets the theme for the application.
