@@ -32,6 +32,7 @@ use crate::{
       OsError,
     },
     set_progress_indicator,
+    set_badge_label
   },
   window::{
     CursorIcon, Fullscreen, ProgressBarState, ResizeDirection, Theme, UserAttentionType,
@@ -1497,6 +1498,14 @@ impl UnownedWindow {
 
   pub fn set_progress_bar(&self, progress: ProgressBarState) {
     set_progress_indicator(progress);
+  }
+
+  pub fn set_badge_count(&self, count: Option<i64>) {
+    set_badge_label(count.and_then(|count| Some(format!("{}", count))));
+  }
+
+  pub fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
   }
 }
 

@@ -1099,7 +1099,7 @@ impl Window {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux / macOS**: Progress bar is app-wide and not specific to this window. Only supported desktop environments with `libunity` (e.g. GNOME).
+  /// - **Linux / macOS**: Unlike windows, progress bar is app-wide and not specific to this window. Only supported desktop environments with `libunity` (e.g. GNOME).
   /// - **iOS / Android:** Unsupported.
   #[inline]
   pub fn set_progress_bar(&self, _progress: ProgressBarState) {
@@ -1115,18 +1115,36 @@ impl Window {
     self.window.set_progress_bar(_progress)
   }
 
-    /// Sets the taskbar progress state.
+  /// Sets the badge count on the taskbar
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux / macOS**: Not Yet Implemented.
+  /// - **Windows**: Windows allows to set an arbitrary .ico file. See set_overlay_icon
+  /// - **Linux / macOS**: Badge count is app-wide and not specific to this window. Only supported desktop environments with `libunity` (e.g. GNOME).
   /// - **iOS / Android:** Unsupported.
   #[inline]
-  pub fn set_overlay_icon(&self, _icon: Option<String>) {
+  pub fn set_badge_count(&self, _count: Option<i64>) {
     #[cfg(any(
-      windows
+      target_os = "linux",
+      target_os = "dragonfly",
+      target_os = "freebsd",
+      target_os = "netbsd",
+      target_os = "openbsd",
+      target_os = "macos",
     ))]
-    self.window.set_overlay_icon(_icon)
+    self.window.set_badge_count(_count)
+  }
+
+  /// Sets the Overlay Icon **(Windows only)**
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux / macOS**: See set_taskbar_badge
+  /// - **iOS / Android:** Unsupported.
+  #[inline]
+  pub fn set_overlay_icon(&self, _icon_path: Option<String>) {
+    #[cfg(windows)]
+    self.window.set_overlay_icon(_icon_path)
   }
 
   /// Requests user attention to the window, this has no effect if the application

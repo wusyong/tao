@@ -15,6 +15,7 @@ mod keycode;
 mod monitor;
 mod observer;
 mod progress_bar;
+mod badge;
 mod util;
 mod view;
 mod window;

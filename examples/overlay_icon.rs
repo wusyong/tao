@@ -2,13 +2,13 @@
 // Copyright 2021-2023 Tauri Programme within The Commons Conservancy
 // SPDX-License-Identifier: Apache-2.0
 
+use std::env::current_dir;
 use tao::{
   event::{ElementState, Event, KeyEvent, WindowEvent},
   event_loop::{ControlFlow, EventLoop},
   keyboard::{Key, ModifiersState},
-  window::WindowBuilder
+  window::WindowBuilder,
 };
-use std::env::current_dir;
 
 #[allow(clippy::single_match)]
 fn main() {
@@ -45,7 +45,7 @@ fn main() {
           ..
         } => {
           if modifiers.is_empty() {
-            let mut path  = current_dir().unwrap();
+            let mut path = current_dir().unwrap();
             path.push("./examples/icon.ico");
 
             window.set_overlay_icon(Some(path.to_str().unwrap().to_string()));

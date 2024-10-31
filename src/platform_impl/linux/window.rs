@@ -979,6 +979,15 @@ impl Window {
     }
   }
 
+  pub fn set_badge_count(&self, count: Option<i64>) {
+    if let Err(e) = self
+      .window_requests_tx
+      .send((WindowId::dummy(), WindowRequest::BadgeCount(count)))
+    {
+      log::warn!("Fail to send update badge count request: {}", e);
+    }
+  }
+
   pub fn theme(&self) -> Theme {
     if let Some(theme) = *self.preferred_theme.borrow() {
       return theme;
@@ -1041,6 +1050,7 @@ pub enum WindowRequest {
   },
   SetVisibleOnAllWorkspaces(bool),
   ProgressBarState(ProgressBarState),
+  BadgeCount(Option<i64>),
   SetTheme(Option<Theme>),
   BackgroundColor(CssProvider, Option<RGBA>),
 }
