@@ -56,9 +56,9 @@ fn main() {
               "4" => 4,
               "5" => 5,
               _ => 20
-            }));
+            }), None);
           } else if modifiers.control_key() && key_str == "1" {
-            window.set_badge_count(None);
+            window.set_badge_count(None, None);
           }
 
           #[cfg(windows)]
