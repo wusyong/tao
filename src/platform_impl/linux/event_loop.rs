@@ -579,7 +579,10 @@ impl<T: 'static> EventLoop<T> {
             window.connect_configure_event(move |window, event| {
               let scale_factor = window.scale_factor();
 
-              let (x, y) = event.position();
+              let (x, y) = window
+                .window()
+                .map(|w| w.root_origin())
+                .unwrap_or_else(|| event.position());
               if let Err(e) = tx_clone.send(Event::WindowEvent {
                 window_id: RootWindowId(id),
                 event: WindowEvent::Moved(
