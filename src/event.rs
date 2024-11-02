@@ -149,7 +149,7 @@ pub enum Event<'a, T: 'static> {
   /// ## Platform-specific
   /// - **macOS**: https://developer.apple.com/documentation/appkit/nsapplicationdelegate/1428642-applicationshouldterminate
   /// - **Other**: Unsupported.
-  DockExitRequested,
+  ExitRequested,
 }
 
 impl<T: Clone> Clone for Event<'static, T> {
@@ -178,7 +178,7 @@ impl<T: Clone> Clone for Event<'static, T> {
       } => Reopen {
         has_visible_windows: *has_visible_windows,
       },
-      DockExitRequested => DockExitRequested,
+      ExitRequested => ExitRequested,
     }
   }
 }
@@ -203,7 +203,7 @@ impl<'a, T> Event<'a, T> {
       } => Ok(Reopen {
         has_visible_windows,
       }),
-      DockExitRequested => Ok(DockExitRequested),
+      ExitRequested => Ok(ExitRequested),
     }
   }
 
@@ -230,7 +230,7 @@ impl<'a, T> Event<'a, T> {
       } => Some(Reopen {
         has_visible_windows,
       }),
-      DockExitRequested => Some(DockExitRequested),
+      ExitRequested => Some(ExitRequested),
     }
   }
 }

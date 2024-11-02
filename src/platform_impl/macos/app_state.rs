@@ -271,7 +271,7 @@ impl AppState {
   }
 
   pub fn should_exit() {
-    HANDLER.handle_nonuser_event(EventWrapper::StaticEvent(Event::DockExitRequested));
+    HANDLER.handle_nonuser_event(EventWrapper::StaticEvent(Event::ExitRequested));
   }
 
   pub fn exit() -> i32 {
