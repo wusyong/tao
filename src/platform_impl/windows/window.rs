@@ -1029,21 +1029,12 @@ impl Window {
       CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap()
     };
 
-    let Some(Icon { inner }) = icon else {
-      unsafe {
-        taskbar
-          .SetOverlayIcon(self.window.0, None, None)
-          .unwrap();
-      }
-      return;
-    };
-
-    let icon = inner.as_raw_handle();
+    let icon = icon.map(|i| i.inner.as_raw_handle()).unwrap_or(HICON::default());
 
     unsafe {
       taskbar
         .SetOverlayIcon(self.window.0, icon, None)
-        .unwrap();
+        .unwrap_or(());
     }
   }
 
