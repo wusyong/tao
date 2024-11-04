@@ -309,9 +309,9 @@ impl<T> EventLoopWindowTarget<T> {
   /// - **Linux:** Only supported desktop environments with `libunity` (e.g. GNOME).
   /// - **iOS / Android:** Unsupported.
   #[inline]
-  pub fn set_badge_count(&self, _badge: Option<i64>, _desktop_filename: Option<String>) {
+  pub fn set_badge_count(&self, _count: Option<i64>, _desktop_filename: Option<String>) {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    self.p.set_bage_count(_progress, _desktop_filename)
+    self.p.set_badge_count(_badge, _desktop_filename)
   }
 
   /// Sets the theme for the application.

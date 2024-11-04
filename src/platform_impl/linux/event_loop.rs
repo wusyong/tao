@@ -271,7 +271,7 @@ impl<T: 'static> EventLoop<T> {
       None
     };
 
-    let mut taskbar = TaskbarIndicator::new();
+    let taskbar = TaskbarIndicator::new();
     let is_wayland = window_target.is_wayland();
 
     // Window Request
@@ -442,6 +442,7 @@ impl<T: 'static> EventLoop<T> {
             };
           }
           WindowRequest::ProgressBarState(_) => unreachable!(),
+          WindowRequest::BadgeCount(_, _) => unreachable!(),
           WindowRequest::SetTheme(_) => unreachable!(),
           WindowRequest::WireUpEvents {
             transparent,

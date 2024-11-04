@@ -1,6 +1,6 @@
 use cocoa::{appkit::NSApp, base::nil, foundation::NSString};
 
-pub fn set_badge_label(&self, label: Option<String>) {
+pub fn set_badge_label(label: Option<String>) {
   unsafe {
     let label = match label {
       None => nil,
