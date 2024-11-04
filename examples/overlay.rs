@@ -4,7 +4,7 @@
 
 use std::env::current_dir;
 use tao::{
-  event::{ElementState, Event, KeyEvent, WindowEvent}, event_loop::{ControlFlow, EventLoop}, keyboard::{Key, ModifiersState}, platform::windows::IconExtWindows, window::WindowBuilder
+  event::{ElementState, Event, KeyEvent, WindowEvent}, event_loop::{ControlFlow, EventLoop}, keyboard::{Key, ModifiersState}, window::WindowBuilder
 };
 
 #[allow(clippy::single_match)]
@@ -60,7 +60,7 @@ fn main() {
 
           #[cfg(windows)]
           {
-            use tao::{window::Icon, platform::windows::WindowExtWindows};
+            use tao::{window::Icon, platform::windows::WindowExtWindows, platform::windows::IconExtWindows};
             if modifiers.is_empty() {
               let mut path = current_dir().unwrap();
               path.push("./examples/icon.ico");

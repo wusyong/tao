@@ -214,6 +214,9 @@ pub trait EventLoopWindowTargetExtUnix {
 
   /// Returns the gtk application for this event loop.
   fn gtk_app(&self) -> &gtk::Application;
+
+  /// Sets the badge count on the taskbar
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>);
 }
 
 impl<T> EventLoopWindowTargetExtUnix for EventLoopWindowTarget<T> {
@@ -254,6 +257,11 @@ impl<T> EventLoopWindowTargetExtUnix for EventLoopWindowTarget<T> {
   #[inline]
   fn gtk_app(&self) -> &gtk::Application {
     &self.p.app
+  }
+
+  #[inline]
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) {
+    self.p.set_badge_count(count, desktop_filename);
   }
 }
 

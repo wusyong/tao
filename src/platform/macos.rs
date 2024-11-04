@@ -396,6 +396,9 @@ pub trait EventLoopWindowTargetExtMacOS {
   /// To set the activation policy before the app starts running, see
   /// [`EventLoopExtMacOS::set_activation_policy`](crate::platform::macos::EventLoopExtMacOS::set_activation_policy).
   fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy);
+
+  /// Sets the badge label on macos dock
+  fn set_badge_label(&self, label: Option<String>);
 }
 
 impl<T> EventLoopWindowTargetExtMacOS for EventLoopWindowTarget<T> {
@@ -422,5 +425,9 @@ impl<T> EventLoopWindowTargetExtMacOS for EventLoopWindowTarget<T> {
     let app: cocoa::base::id = unsafe { msg_send![cls, sharedApplication] };
     let ns_activation_policy: NSApplicationActivationPolicy = activation_policy.into();
     unsafe { msg_send![app, setActivationPolicy: ns_activation_policy] }
+  }
+
+  fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
   }
 }
