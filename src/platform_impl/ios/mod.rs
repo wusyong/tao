@@ -80,6 +80,7 @@ mod keycode;
 mod monitor;
 mod view;
 mod window;
+mod badge;
 
 use std::fmt;
 
@@ -90,7 +91,7 @@ pub use self::{
   monitor::{MonitorHandle, VideoMode},
   window::{PlatformSpecificWindowBuilderAttributes, Window, WindowId},
 };
-
+pub(crate) use badge::set_badge_count;
 pub(crate) use crate::icon::NoIcon as PlatformIcon;
 
 // todo: implement iOS keyboard event

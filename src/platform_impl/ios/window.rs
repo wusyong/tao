@@ -17,6 +17,7 @@ use crate::{
   monitor::MonitorHandle as RootMonitorHandle,
   platform::ios::{MonitorHandleExtIOS, ScreenEdge, ValidOrientations},
   platform_impl::platform::{
+    set_badge_count,
     app_state,
     event_loop::{self, EventProxy, EventWrapper},
     ffi::{
@@ -439,6 +440,11 @@ impl Inner {
 
   pub fn theme(&self) -> Theme {
     Theme::Light
+  }
+
+  /// Sets badge count on iOS launcher. 0 hides the count
+  pub fn set_badge_count(&self, count: i32) {
+    set_badge_count(count);
   }
 }
 
