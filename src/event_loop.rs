@@ -301,19 +301,6 @@ impl<T> EventLoopWindowTarget<T> {
     self.p.set_progress_bar(_progress)
   }
 
-  /// Sets the badge count
-  ///
-  /// ## Platform-specific
-  ///
-  /// - **Windows:** Unsupported. Use the Progress Bar Function Available in Window (Windows can have different taskbar badges for different Window)
-  /// - **Linux:** Only supported desktop environments with `libunity` (e.g. GNOME).
-  /// - **iOS / Android:** Unsupported.
-  #[inline]
-  pub fn set_badge_count(&self, _count: Option<i64>, _desktop_filename: Option<String>) {
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    self.p.set_badge_count(_badge, _desktop_filename)
-  }
-
   /// Sets the theme for the application.
   ///
   /// ## Platform-specific

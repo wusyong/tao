@@ -1500,10 +1500,6 @@ impl UnownedWindow {
     set_progress_indicator(progress);
   }
 
-  pub fn set_badge_count(&self, count: Option<i64>, _desktop_filename: Option<String>) {
-    set_badge_label(count.and_then(|count| Some(format!("{}", count))));
-  }
-
   pub fn set_badge_label(&self, label: Option<String>) {
     set_badge_label(label);
   }

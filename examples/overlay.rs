@@ -4,10 +4,7 @@
 
 use std::env::current_dir;
 use tao::{
-  event::{ElementState, Event, KeyEvent, WindowEvent},
-  event_loop::{ControlFlow, EventLoop},
-  keyboard::{Key, ModifiersState},
-  window::WindowBuilder,
+  event::{ElementState, Event, KeyEvent, WindowEvent}, event_loop::{ControlFlow, EventLoop}, keyboard::{Key, ModifiersState}, platform::windows::IconExtWindows, window::WindowBuilder
 };
 
 #[allow(clippy::single_match)]
@@ -62,13 +59,16 @@ fn main() {
           }
 
           #[cfg(windows)]
-          if modifiers.is_empty() {
-            let mut path = current_dir().unwrap();
-            path.push("./examples/icon.ico");
+          {
+            use tao::{window::Icon, platform::windows::WindowExtWindows};
+            if modifiers.is_empty() {
+              let mut path = current_dir().unwrap();
+              path.push("./examples/icon.ico");
 
-            window.set_overlay_icon(Some(path.to_str().unwrap().to_string()));
-          } else if modifiers.control_key() && key_str == "1" {
-            window.set_overlay_icon(None);
+              window.set_overlay_icon(Some(Icon::from_path(path, None).unwrap()));
+            } else if modifiers.control_key() && key_str == "1" {
+              window.set_overlay_icon(None);
+            }
           }
         }
         _ => {}

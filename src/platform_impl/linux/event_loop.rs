@@ -271,7 +271,7 @@ impl<T: 'static> EventLoop<T> {
       None
     };
 
-    let taskbar = TaskbarIndicator::new();
+    let mut taskbar = TaskbarIndicator::new();
     let is_wayland = window_target.is_wayland();
 
     // Window Request

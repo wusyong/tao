@@ -78,6 +78,8 @@ pub trait WindowExtUnix {
 
   /// Whether to show the window icon in the taskbar or not.
   fn set_skip_taskbar(&self, skip: bool) -> Result<(), ExternalError>;
+
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>);
 }
 
 impl WindowExtUnix for Window {
@@ -99,6 +101,10 @@ impl WindowExtUnix for Window {
   ) -> Result<Window, OsError> {
     let window = UnixWindow::new_from_gtk_window(&event_loop_window_target.p, window)?;
     Ok(Window { window: window })
+  }
+
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) {
+    self.window.set_badge_count(count, desktop_filename);
   }
 }
 

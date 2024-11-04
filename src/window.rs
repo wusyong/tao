@@ -1122,13 +1122,13 @@ impl Window {
   /// 
   /// ## Platform-specific
   ///
-  /// - **Windows**: Windows allows to set an arbitrary .ico file. See set_overlay_icon
+  /// - **Windows**: Windows allows to set an arbitrary .ico file. See set_overlay_icon 
   /// - **Linux / macOS**: Badge count is app-wide and not specific to this window. Only supported desktop environments with `libunity` (e.g. GNOME).
   /// - **iOS / Android:** Unsupported.
   #[inline]
   pub fn set_badge_count(&self, _count: Option<i64>, _desktop_filename: Option<String>) {
     #[cfg(target_os = "macos")]
-    self.window.set_badge_count(_count);
+    self.window.set_badge_label(_count.map(|c| c.to_string()));
 
     #[cfg(any(
       target_os = "linux",
@@ -1138,18 +1138,6 @@ impl Window {
       target_os = "openbsd",
     ))]
     self.window.set_badge_count(_count, _desktop_filename);
-  }
-
-  /// Sets the Overlay Icon **(Windows only)**
-  ///
-  /// ## Platform-specific
-  ///
-  /// - **Linux / macOS**: See set_taskbar_badge
-  /// - **iOS / Android:** Unsupported.
-  #[inline]
-  pub fn set_overlay_icon(&self, _icon_path: Option<String>) {
-    #[cfg(windows)]
-    self.window.set_overlay_icon(_icon_path)
   }
 
   /// Requests user attention to the window, this has no effect if the application

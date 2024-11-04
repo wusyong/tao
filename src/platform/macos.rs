@@ -84,6 +84,9 @@ pub trait WindowExtMacOS {
   ///
   /// <https://developer.apple.com/documentation/appkit/nswindow/1419167-titlebarappearstransparent>
   fn set_titlebar_transparent(&self, transparent: bool);
+
+  /// Sets the badge label on the taskbar
+  fn set_badge_label(&self, label: Option<String>);
 }
 
 impl WindowExtMacOS for Window {
@@ -160,6 +163,11 @@ impl WindowExtMacOS for Window {
   #[inline]
   fn set_titlebar_transparent(&self, transparent: bool) {
     self.window.set_titlebar_transparent(transparent);
+  }
+
+  #[inline]
+  fn set_badge_label(&self, label: Option<String>) {
+    self.window.set_badge_label(label);
   }
 }
 

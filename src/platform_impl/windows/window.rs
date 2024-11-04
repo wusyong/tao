@@ -13,7 +13,6 @@ use std::{
   os::windows::ffi::OsStrExt,
   sync::Arc,
 };
-use windows_core::HSTRING;
 
 use crossbeam_channel as channel;
 use windows::{
@@ -1025,37 +1024,24 @@ impl Window {
   }
 
   #[inline]
-  pub fn set_overlay_icon(&self, icon: Option<String>) {
-    let Some(icon) = icon else {
-      unsafe {
-        let taskbar_list: ITaskbarList =
-          CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap();
+  pub fn set_overlay_icon(&self, icon: Option<Icon>) {
+    let taskbar: ITaskbarList = unsafe {
+      CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap()
+    };
 
-        taskbar_list
+    let Some(Icon { inner }) = icon else {
+      unsafe {
+        taskbar
           .SetOverlayIcon(self.window.0, None, None)
           .unwrap();
       }
       return;
     };
 
-    let image = unsafe {
-      LoadImageW(
-        None,
-        PCWSTR(HSTRING::from(icon).as_ptr()),
-        IMAGE_ICON,
-        0,
-        0,
-        IMAGE_FLAGS(0x00000040 | 0x00000010),
-      )
-    }
-    .unwrap();
-
-    let icon = HICON(image.0);
+    let icon = inner.as_raw_handle();
 
     unsafe {
-      let taskbar_list: ITaskbarList = CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap();
-
-      taskbar_list
+      taskbar
         .SetOverlayIcon(self.window.0, icon, None)
         .unwrap();
     }
