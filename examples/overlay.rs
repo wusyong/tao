@@ -26,7 +26,10 @@ use tao::platform::macos::WindowExtMacos;
 use tao::platform::ios::WindowExtIos;
 
 #[cfg(windows)]
-use tao::{platform::windows::IconExtWindows, platform::windows::WindowExtWindows, window::Icon};
+use tao::{
+  dpi::PhysicalSize, platform::windows::IconExtWindows, platform::windows::WindowExtWindows,
+  window::Icon,
+};
 
 #[allow(clippy::single_match)]
 fn main() {
@@ -79,8 +82,9 @@ fn main() {
             {
               let mut path = current_dir().unwrap();
               path.push("./examples/icon.ico");
+              let icon = Icon::from_path(path, Some(PhysicalSize::new(32, 32))).unwrap();
 
-              window.set_overlay_icon(Some(Icon::from_path(path, None).unwrap()));
+              window.set_overlay_icon(Some(icon));
             }
 
             #[cfg(any(
