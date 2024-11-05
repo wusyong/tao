@@ -26,9 +26,7 @@ use tao::platform::macos::WindowExtMacos;
 use tao::platform::ios::WindowExtIos;
 
 #[cfg(windows)]
-use tao::{
-  platform::windows::IconExtWindows, platform::windows::WindowExtWindows, window::Icon,
-};
+use tao::{platform::windows::IconExtWindows, platform::windows::WindowExtWindows, window::Icon};
 
 #[allow(clippy::single_match)]
 fn main() {
@@ -92,10 +90,7 @@ fn main() {
               target_os = "netbsd",
               target_os = "openbsd"
             ))]
-            window.set_badge_count(
-              Some(_count),
-              None,
-            );
+            window.set_badge_count(Some(_count), None);
 
             #[cfg(target_os = "macos")]
             window.set_badge_label(_count.to_string().into());
