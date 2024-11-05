@@ -10,6 +10,26 @@ use tao::{
   window::WindowBuilder,
 };
 
+#[cfg(any(
+  target_os = "linux",
+  target_os = "dragonfly",
+  target_os = "freebsd",
+  target_os = "netbsd",
+  target_os = "openbsd"
+))]
+use tao::platform::linux::WindowExtUnix;
+
+#[cfg(target_os = "macos")]
+use tao::platform::macos::WindowExtMacos;
+
+#[cfg(target_os = "ios")]
+use tao::platform::ios::WindowExtIos;
+
+#[cfg(windows)]
+use tao::{
+  platform::windows::IconExtWindows, platform::windows::WindowExtWindows, window::Icon,
+};
+
 #[allow(clippy::single_match)]
 fn main() {
   env_logger::init();
@@ -47,36 +67,59 @@ fn main() {
             },
           ..
         } => {
-          #[cfg(not(windows))]
-          if modifiers.is_empty() {
-            window.set_badge_count(
-              Some(match key_str {
-                "1" => 1,
-                "2" => 2,
-                "3" => 3,
-                "4" => 4,
-                "5" => 5,
-                _ => 20,
-              }),
-              None,
-            );
-          } else if modifiers.control_key() && key_str == "1" {
-            window.set_badge_count(None, None);
-          }
+          let _count = match key_str {
+            "1" => 1,
+            "2" => 2,
+            "3" => 3,
+            "4" => 4,
+            "5" => 5,
+            _ => 20,
+          };
 
-          #[cfg(windows)]
-          {
-            use tao::{
-              platform::windows::IconExtWindows, platform::windows::WindowExtWindows, window::Icon,
-            };
-            if modifiers.is_empty() {
+          if modifiers.is_empty() {
+            #[cfg(windows)]
+            {
               let mut path = current_dir().unwrap();
               path.push("./examples/icon.ico");
 
               window.set_overlay_icon(Some(Icon::from_path(path, None).unwrap()));
-            } else if modifiers.control_key() && key_str == "1" {
-              window.set_overlay_icon(None);
             }
+
+            #[cfg(any(
+              target_os = "linux",
+              target_os = "dragonfly",
+              target_os = "freebsd",
+              target_os = "netbsd",
+              target_os = "openbsd"
+            ))]
+            window.set_badge_count(
+              Some(_count),
+              None,
+            );
+
+            #[cfg(target_os = "macos")]
+            window.set_badge_label(_count.to_string().into());
+
+            #[cfg(target_os = "ios")]
+            window.set_badge_count(_count);
+          } else if modifiers.control_key() && key_str == "1" {
+            #[cfg(windows)]
+            window.set_overlay_icon(None);
+
+            #[cfg(any(
+              target_os = "linux",
+              target_os = "dragonfly",
+              target_os = "freebsd",
+              target_os = "netbsd",
+              target_os = "openbsd"
+            ))]
+            window.set_badge_count(None, None);
+
+            #[cfg(target_os = "macos")]
+            window.set_badge_label(None);
+
+            #[cfg(target_os = "ios")]
+            window.set_badge_count(0);
           }
         }
         _ => {}
