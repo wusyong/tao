@@ -10,7 +10,7 @@ use crate::{
   dpi::{LogicalSize, Position},
   event_loop::{EventLoop, EventLoopWindowTarget},
   monitor::MonitorHandle,
-  platform_impl::{get_aux_state_mut, Parent},
+  platform_impl::{get_aux_state_mut, set_badge_label, Parent},
   window::{Window, WindowBuilder},
 };
 
