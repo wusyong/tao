@@ -152,12 +152,12 @@ impl WindowExtIOS for Window {
   }
 }
 
-pub trait EventLoopWindowTargetExtIos {
+pub trait EventLoopWindowTargetExtIOS {
   /// Sets the badge count on iOS launcher. 0 hides the count
   fn set_badge_count(&self, count: i32);
 }
 
-impl<T> EventLoopWindowTargetExtIos for EventLoopWindowTarget<T> {
+impl<T> EventLoopWindowTargetExtIOS for EventLoopWindowTarget<T> {
   fn set_badge_count(&self, count: i32) {
     set_badge_count(count)
   }

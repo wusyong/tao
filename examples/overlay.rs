@@ -20,10 +20,10 @@ use tao::{
 use tao::platform::unix::WindowExtUnix;
 
 #[cfg(target_os = "macos")]
-use tao::platform::macos::WindowExtMacos;
+use tao::platform::macos::WindowExtMacOS;
 
 #[cfg(target_os = "ios")]
-use tao::platform::ios::WindowExtIos;
+use tao::platform::ios::WindowExtIOS;
 
 #[cfg(windows)]
 use tao::{
