@@ -7,7 +7,7 @@
 use std::os::raw::c_void;
 
 use crate::{
-  event_loop::EventLoop,
+  event_loop::{EventLoop, EventLoopWindowTarget},
   monitor::{MonitorHandle, VideoMode},
   window::{Window, WindowBuilder},
 };
