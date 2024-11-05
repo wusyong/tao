@@ -2,4 +2,4 @@
 "tao": patch
 ---
 
-Add **set_badge_count** for Linux, iOS; **set_badge_label** for Macos; **set_overlay_icon** for Windows
+Add **WindowExtUnix::set_badge_count** for Linux; **WindowExtIos::set_badge_count** iOS; **WindowExtMacos::set_badge_label** for Macos; **MacdowExtWindows::set_overlay_icon** for Windows

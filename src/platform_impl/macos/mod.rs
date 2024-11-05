@@ -24,6 +24,7 @@ mod window_delegate;
 use std::{fmt, ops::Deref, sync::Arc};
 
 pub(crate) use self::event_loop::PlatformSpecificEventLoopAttributes;
+pub(crate) use badge::set_badge_label;
 pub use self::{
   app_delegate::{get_aux_state_mut, AuxDelegateState},
   event::KeyEventExtra,
