@@ -99,6 +99,7 @@ pub trait WindowExtIOS {
   /// [`-[UIViewController setNeedsStatusBarAppearanceUpdate]`](https://developer.apple.com/documentation/uikit/uiviewcontroller/1621354-setneedsstatusbarappearanceupdat?language=objc).
   fn set_prefers_status_bar_hidden(&self, hidden: bool);
 
+  /// Sets the badge count on iOS launcher. 0 hides the count
   fn set_badge_count(&self, count: i32);
 }
 
@@ -148,6 +149,17 @@ impl WindowExtIOS for Window {
   #[inline]
   fn set_badge_count(&self, count: i32) {
     self.window.set_badge_count(count)
+  }
+}
+
+pub trait EventLoopWindowTargetExtIos {
+  /// Sets the badge count on iOS launcher. 0 hides the count
+  fn set_badge_count(&self, count: i32);
+}
+
+impl<T> EventLoopWindowTargetExtIos for EventLoopWindowTarget<T> {
+  fn set_badge_count(&self, count: i32) {
+    set_badge_count(count)
   }
 }
 
