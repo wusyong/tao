@@ -7,6 +7,7 @@
 mod app;
 mod app_delegate;
 mod app_state;
+mod badge;
 mod event;
 mod event_loop;
 mod ffi;
@@ -15,7 +16,6 @@ mod keycode;
 mod monitor;
 mod observer;
 mod progress_bar;
-mod badge;
 mod util;
 mod view;
 mod window;
@@ -24,7 +24,6 @@ mod window_delegate;
 use std::{fmt, ops::Deref, sync::Arc};
 
 pub(crate) use self::event_loop::PlatformSpecificEventLoopAttributes;
-pub(crate) use badge::set_badge_label;
 pub use self::{
   app_delegate::{get_aux_state_mut, AuxDelegateState},
   event::KeyEventExtra,
@@ -37,6 +36,7 @@ pub use self::{
 use crate::{
   error::OsError as RootOsError, event::DeviceId as RootDeviceId, window::WindowAttributes,
 };
+pub(crate) use badge::set_badge_label;
 
 pub(crate) use icon::PlatformIcon;
 

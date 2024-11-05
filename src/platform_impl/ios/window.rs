@@ -17,14 +17,13 @@ use crate::{
   monitor::MonitorHandle as RootMonitorHandle,
   platform::ios::{MonitorHandleExtIOS, ScreenEdge, ValidOrientations},
   platform_impl::platform::{
-    set_badge_count,
     app_state,
     event_loop::{self, EventProxy, EventWrapper},
     ffi::{
       id, CGFloat, CGPoint, CGRect, CGSize, UIEdgeInsets, UIInterfaceOrientationMask, UIRectEdge,
       UIScreenOverscanCompensation,
     },
-    monitor, view, EventLoopWindowTarget, MonitorHandle,
+    monitor, set_badge_count, view, EventLoopWindowTarget, MonitorHandle,
   },
   window::{
     CursorIcon, Fullscreen, ResizeDirection, Theme, UserAttentionType, WindowAttributes,

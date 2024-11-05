@@ -22,7 +22,6 @@ use crate::{
 };
 
 use crate::platform_impl::platform::{
-  set_badge_count,
   app_state,
   ffi::{
     id, kCFRunLoopAfterWaiting, kCFRunLoopBeforeWaiting, kCFRunLoopCommonModes,
@@ -32,7 +31,7 @@ use crate::platform_impl::platform::{
     CFRunLoopSourceInvalidate, CFRunLoopSourceRef, CFRunLoopSourceSignal, CFRunLoopWakeUp,
     NSStringRust, UIApplicationMain, UIUserInterfaceIdiom,
   },
-  monitor, view, MonitorHandle,
+  monitor, set_badge_count, view, MonitorHandle,
 };
 
 #[non_exhaustive]

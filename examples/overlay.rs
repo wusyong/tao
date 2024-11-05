@@ -4,7 +4,10 @@
 
 use std::env::current_dir;
 use tao::{
-  event::{ElementState, Event, KeyEvent, WindowEvent}, event_loop::{ControlFlow, EventLoop}, keyboard::{Key, ModifiersState}, window::WindowBuilder
+  event::{ElementState, Event, KeyEvent, WindowEvent},
+  event_loop::{ControlFlow, EventLoop},
+  keyboard::{Key, ModifiersState},
+  window::WindowBuilder,
 };
 
 #[allow(clippy::single_match)]
@@ -46,21 +49,26 @@ fn main() {
         } => {
           #[cfg(not(windows))]
           if modifiers.is_empty() {
-            window.set_badge_count(Some(match key_str {
-              "1" => 1,
-              "2" => 2,
-              "3" => 3,
-              "4" => 4,
-              "5" => 5,
-              _ => 20
-            }), None);
+            window.set_badge_count(
+              Some(match key_str {
+                "1" => 1,
+                "2" => 2,
+                "3" => 3,
+                "4" => 4,
+                "5" => 5,
+                _ => 20,
+              }),
+              None,
+            );
           } else if modifiers.control_key() && key_str == "1" {
             window.set_badge_count(None, None);
           }
 
           #[cfg(windows)]
           {
-            use tao::{window::Icon, platform::windows::WindowExtWindows, platform::windows::IconExtWindows};
+            use tao::{
+              platform::windows::IconExtWindows, platform::windows::WindowExtWindows, window::Icon,
+            };
             if modifiers.is_empty() {
               let mut path = current_dir().unwrap();
               path.push("./examples/icon.ico");

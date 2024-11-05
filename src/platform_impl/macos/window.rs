@@ -31,8 +31,7 @@ use crate::{
       window_delegate::new_delegate,
       OsError,
     },
-    set_progress_indicator,
-    set_badge_label
+    set_badge_label, set_progress_indicator,
   },
   window::{
     CursorIcon, Fullscreen, ProgressBarState, ResizeDirection, Theme, UserAttentionType,

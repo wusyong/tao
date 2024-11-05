@@ -37,8 +37,7 @@ use crate::{
       observer::*,
       util::{self, IdRef},
     },
-    set_progress_indicator,
-    set_badge_label
+    set_badge_label, set_progress_indicator,
   },
   window::{ProgressBarState, Theme},
 };

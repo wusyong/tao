@@ -1025,11 +1025,12 @@ impl Window {
 
   #[inline]
   pub fn set_overlay_icon(&self, icon: Option<Icon>) {
-    let taskbar: ITaskbarList = unsafe {
-      CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap()
-    };
+    let taskbar: ITaskbarList =
+      unsafe { CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap() };
 
-    let icon = icon.map(|i| i.inner.as_raw_handle()).unwrap_or(HICON::default());
+    let icon = icon
+      .map(|i| i.inner.as_raw_handle())
+      .unwrap_or(HICON::default());
 
     unsafe {
       taskbar
