@@ -98,6 +98,8 @@ pub trait WindowExtIOS {
   /// and then calls
   /// [`-[UIViewController setNeedsStatusBarAppearanceUpdate]`](https://developer.apple.com/documentation/uikit/uiviewcontroller/1621354-setneedsstatusbarappearanceupdat?language=objc).
   fn set_prefers_status_bar_hidden(&self, hidden: bool);
+
+  fn set_badge_count(&self, count: i21);
 }
 
 impl WindowExtIOS for Window {
@@ -141,6 +143,11 @@ impl WindowExtIOS for Window {
   #[inline]
   fn set_prefers_status_bar_hidden(&self, hidden: bool) {
     self.window.set_prefers_status_bar_hidden(hidden)
+  }
+
+  #[inline]
+  fn set_badge_count(&self, count: i32) {
+    self.window.set_badge_count(count)
   }
 }
 
