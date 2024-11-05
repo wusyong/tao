@@ -17,7 +17,7 @@ use tao::{
   target_os = "netbsd",
   target_os = "openbsd"
 ))]
-use tao::platform::linux::WindowExtUnix;
+use tao::platform::unix::WindowExtUnix;
 
 #[cfg(target_os = "macos")]
 use tao::platform::macos::WindowExtMacos;

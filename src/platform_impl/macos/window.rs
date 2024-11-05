@@ -1695,6 +1695,10 @@ impl WindowExtMacOS for UnownedWindow {
         .setTitlebarAppearsTransparent_(transparent as BOOL);
     }
   }
+
+  fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
+  }
 }
 
 impl Drop for UnownedWindow {
