@@ -7,8 +7,9 @@
 use std::os::raw::c_void;
 
 use crate::{
-  event_loop::EventLoop,
+  event_loop::{EventLoop, EventLoopWindowTarget},
   monitor::{MonitorHandle, VideoMode},
+  platform_impl::set_badge_count,
   window::{Window, WindowBuilder},
 };
 
@@ -98,6 +99,9 @@ pub trait WindowExtIOS {
   /// and then calls
   /// [`-[UIViewController setNeedsStatusBarAppearanceUpdate]`](https://developer.apple.com/documentation/uikit/uiviewcontroller/1621354-setneedsstatusbarappearanceupdat?language=objc).
   fn set_prefers_status_bar_hidden(&self, hidden: bool);
+
+  /// Sets the badge count on iOS launcher. 0 hides the count
+  fn set_badge_count(&self, count: i32);
 }
 
 impl WindowExtIOS for Window {
@@ -141,6 +145,22 @@ impl WindowExtIOS for Window {
   #[inline]
   fn set_prefers_status_bar_hidden(&self, hidden: bool) {
     self.window.set_prefers_status_bar_hidden(hidden)
+  }
+
+  #[inline]
+  fn set_badge_count(&self, count: i32) {
+    self.window.set_badge_count(count)
+  }
+}
+
+pub trait EventLoopWindowTargetExtIOS {
+  /// Sets the badge count on iOS launcher. 0 hides the count
+  fn set_badge_count(&self, count: i32);
+}
+
+impl<T> EventLoopWindowTargetExtIOS for EventLoopWindowTarget<T> {
+  fn set_badge_count(&self, count: i32) {
+    set_badge_count(count)
   }
 }
 

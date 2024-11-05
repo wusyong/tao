@@ -23,7 +23,7 @@ use crate::{
       id, CGFloat, CGPoint, CGRect, CGSize, UIEdgeInsets, UIInterfaceOrientationMask, UIRectEdge,
       UIScreenOverscanCompensation,
     },
-    monitor, view, EventLoopWindowTarget, MonitorHandle,
+    monitor, set_badge_count, view, EventLoopWindowTarget, MonitorHandle,
   },
   window::{
     CursorIcon, Fullscreen, ResizeDirection, Theme, UserAttentionType, WindowAttributes,
@@ -439,6 +439,11 @@ impl Inner {
 
   pub fn theme(&self) -> Theme {
     Theme::Light
+  }
+
+  /// Sets badge count on iOS launcher. 0 hides the count
+  pub fn set_badge_count(&self, count: i32) {
+    set_badge_count(count);
   }
 }
 

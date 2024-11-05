@@ -12,6 +12,9 @@ struct UnityLib {
   unity_launcher_entry_set_progress: unsafe extern "C" fn(entry: *const isize, value: f64) -> i32,
   unity_launcher_entry_set_progress_visible:
     unsafe extern "C" fn(entry: *const isize, value: i32) -> i32,
+  unity_launcher_entry_set_count: unsafe extern "C" fn(entry: *const isize, value: i64) -> i32,
+  unity_launcher_entry_set_count_visible:
+    unsafe extern "C" fn(entry: *const isize, value: bool) -> bool,
 }
 
 pub struct TaskbarIndicator {
@@ -116,6 +119,41 @@ impl TaskbarIndicator {
               if is_visible { 1 } else { 0 },
             )
           };
+        }
+      }
+    }
+  }
+
+  pub fn update_count(&mut self, count: Option<i64>, desktop_filename: Option<String>) {
+    if let Some(uri) = desktop_filename {
+      self.desktop_filename = Some(uri);
+    }
+
+    self.ensure_lib_load();
+
+    if !self.is_unity_running() {
+      return;
+    }
+
+    if let Some(uri) = &self.desktop_filename {
+      self.desktop_filename_c_str = Some(CString::new(uri.as_str()).unwrap_or_default());
+    }
+
+    if self.unity_entry.is_none() {
+      self.ensure_entry_load();
+    }
+
+    if let Some(unity_lib) = &self.unity_lib {
+      if let Some(unity_entry) = &self.unity_entry {
+        // Sets count
+        if let Some(count) = count {
+          unsafe { (unity_lib.unity_launcher_entry_set_count)(*unity_entry, count) };
+          unsafe { (unity_lib.unity_launcher_entry_set_count_visible)(*unity_entry, true) };
+        }
+        // removes the count
+        else {
+          unsafe { (unity_lib.unity_launcher_entry_set_count)(*unity_entry, 0) };
+          unsafe { (unity_lib.unity_launcher_entry_set_count_visible)(*unity_entry, false) };
         }
       }
     }

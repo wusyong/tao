@@ -7,6 +7,7 @@
 mod app;
 mod app_delegate;
 mod app_state;
+mod badge;
 mod event;
 mod event_loop;
 mod ffi;
@@ -35,6 +36,7 @@ pub use self::{
 use crate::{
   error::OsError as RootOsError, event::DeviceId as RootDeviceId, window::WindowAttributes,
 };
+pub(crate) use badge::set_badge_label;
 
 pub(crate) use icon::PlatformIcon;
 

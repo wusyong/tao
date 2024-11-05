@@ -31,7 +31,7 @@ use crate::{
       window_delegate::new_delegate,
       OsError,
     },
-    set_progress_indicator,
+    set_badge_label, set_progress_indicator,
   },
   window::{
     CursorIcon, Fullscreen, ProgressBarState, ResizeDirection, Theme, UserAttentionType,
@@ -1498,6 +1498,10 @@ impl UnownedWindow {
   pub fn set_progress_bar(&self, progress: ProgressBarState) {
     set_progress_indicator(progress);
   }
+
+  pub fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
+  }
 }
 
 impl WindowExtMacOS for UnownedWindow {
@@ -1690,6 +1694,10 @@ impl WindowExtMacOS for UnownedWindow {
         .ns_window
         .setTitlebarAppearsTransparent_(transparent as BOOL);
     }
+  }
+
+  fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
   }
 }
 
