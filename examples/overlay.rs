@@ -84,7 +84,7 @@ fn main() {
               path.push("./examples/icon.ico");
               let icon = Icon::from_path(path, Some(PhysicalSize::new(32, 32))).unwrap();
 
-              window.set_overlay_icon(Some(icon));
+              window.set_overlay_icon(Some(&icon));
             }
 
             #[cfg(any(

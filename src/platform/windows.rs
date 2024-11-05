@@ -160,7 +160,7 @@ pub trait WindowExtWindows {
   fn set_taskbar_icon(&self, taskbar_icon: Option<Icon>);
 
   /// This sets the overlay icon
-  fn set_overlay_icon(&self, icon: Option<Icon>);
+  fn set_overlay_icon(&self, icon: Option<&Icon>);
 
   /// Returns the current window theme.
   fn theme(&self) -> Theme;
@@ -243,7 +243,7 @@ impl WindowExtWindows for Window {
   }
 
   #[inline]
-  fn set_overlay_icon(&self, icon: Option<Icon>) {
+  fn set_overlay_icon(&self, icon: Option<&Icon>) {
     self.window.set_overlay_icon(icon);
   }
 }

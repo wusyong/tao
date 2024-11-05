@@ -1024,7 +1024,7 @@ impl Window {
   }
 
   #[inline]
-  pub fn set_overlay_icon(&self, icon: Option<Icon>) {
+  pub fn set_overlay_icon(&self, icon: Option<&Icon>) {
     let taskbar: ITaskbarList =
       unsafe { CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap() };
 
