@@ -7,9 +7,9 @@
 use std::os::raw::c_void;
 
 use crate::{
-  platform_impl::set_badge_count,
   event_loop::{EventLoop, EventLoopWindowTarget},
   monitor::{MonitorHandle, VideoMode},
+  platform_impl::set_badge_count,
   window::{Window, WindowBuilder},
 };
 
