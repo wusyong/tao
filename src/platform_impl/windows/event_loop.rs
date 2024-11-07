@@ -335,7 +335,7 @@ impl<T> EventLoopWindowTarget<T> {
   pub fn set_theme(&self, theme: Option<Theme>) {
     *self.preferred_theme.lock() = theme;
     self.runner_shared.owned_windows(|window| {
-      let _ = unsafe { SendMessageW(window, WM_SETTINGCHANGE, WPARAM(0), LPARAM(0)) };
+      let _ = unsafe { SendMessageW(window, *CHANGE_THEME_MSG_ID, WPARAM(0), LPARAM(0)) };
     });
   }
 }
@@ -623,6 +623,11 @@ lazy_static! {
     /// documentation in the `window_state` module for more information.
     pub static ref SET_RETAIN_STATE_ON_SIZE_MSG_ID: u32 = unsafe {
         RegisterWindowMessageA(s!("Tao::SetRetainMaximized"))
+    };
+    /// Message sent by event loop when event loop's prefered theme changed.
+    /// WPARAM and LPARAM are unused.
+    pub static ref CHANGE_THEME_MSG_ID: u32 = unsafe {
+        RegisterWindowMessageA(s!("Tao::ChangeTheme"))
     };
     /// When the taskbar is created, it registers a message with the "TaskbarCreated" string and then broadcasts this message to all top-level windows
     /// When the application receives this message, it should assume that any taskbar icons it added have been removed and add them again.
@@ -1105,6 +1110,25 @@ unsafe fn public_window_callback_inner<T: 'static>(
           subclass_input.event_loop_runner.redraw_events_cleared();
           process_control_flow(&subclass_input.event_loop_runner);
         }
+      }
+    }
+
+    win32wm::WM_ERASEBKGND => {
+      let w = subclass_input.window_state.lock();
+      if let Some(color) = w.background_color {
+        let hdc = HDC(wparam.0 as *mut _);
+        let mut rc = RECT::default();
+        if GetClientRect(window, &mut rc).is_ok() {
+          let brush = CreateSolidBrush(util::RGB(color.0, color.1, color.2));
+          FillRect(hdc, &rc, brush);
+          let _ = DeleteObject(brush);
+
+          result = ProcResult::Value(LRESULT(1));
+        } else {
+          result = ProcResult::DefSubclassProc;
+        }
+      } else {
+        result = ProcResult::DefSubclassProc;
       }
     }
 
@@ -2072,23 +2096,7 @@ unsafe fn public_window_callback_inner<T: 'static>(
     }
 
     win32wm::WM_SETTINGCHANGE => {
-      use crate::event::WindowEvent::ThemeChanged;
-
-      let preferred_theme = subclass_input.window_state.lock().preferred_theme;
-      let new_theme = try_window_theme(
-        window,
-        preferred_theme.or(*subclass_input.event_loop_preferred_theme.lock()),
-      );
-      let mut window_state = subclass_input.window_state.lock();
-
-      if window_state.current_theme != new_theme {
-        window_state.current_theme = new_theme;
-        mem::drop(window_state);
-        subclass_input.send_event(Event::WindowEvent {
-          window_id: RootWindowId(WindowId(window.0 as _)),
-          event: ThemeChanged(new_theme),
-        });
-      }
+      update_theme(subclass_input, window, true);
     }
 
     win32wm::WM_NCCALCSIZE => {
@@ -2197,6 +2205,9 @@ unsafe fn public_window_callback_inner<T: 'static>(
           f.set(WindowFlags::MARKER_RETAIN_STATE_ON_SIZE, wparam.0 != 0)
         });
         result = ProcResult::Value(LRESULT(0));
+      } else if msg == *CHANGE_THEME_MSG_ID {
+        update_theme(subclass_input, window, false);
+        result = ProcResult::Value(LRESULT(0));
       } else if msg == *S_U_TASKBAR_RESTART {
         let window_state = subclass_input.window_state.lock();
         let _ = set_skip_taskbar(window, window_state.skip_taskbar);
@@ -2213,6 +2224,31 @@ unsafe fn public_window_callback_inner<T: 'static>(
     ProcResult::DefSubclassProc => DefSubclassProc(window, msg, wparam, lparam),
     ProcResult::DefWindowProc => DefWindowProcW(window, msg, wparam, lparam),
     ProcResult::Value(val) => val,
+  }
+}
+
+fn update_theme<T>(
+  subclass_input: &SubclassInput<T>,
+  window: HWND,
+  from_settings_change_event: bool,
+) {
+  let mut window_state = subclass_input.window_state.lock();
+  let preferred_theme = window_state
+    .preferred_theme
+    .or(*subclass_input.event_loop_preferred_theme.lock());
+  if from_settings_change_event && preferred_theme.is_some() {
+    return;
+  }
+  let new_theme = try_window_theme(window, preferred_theme, !from_settings_change_event);
+  if window_state.current_theme != new_theme {
+    window_state.current_theme = new_theme;
+    mem::drop(window_state);
+    unsafe {
+      subclass_input.send_event(Event::WindowEvent {
+        window_id: RootWindowId(WindowId(window.0 as _)),
+        event: WindowEvent::ThemeChanged(new_theme),
+      })
+    };
   }
 }
 

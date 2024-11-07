@@ -68,7 +68,7 @@ fn main() {
             ..
           } => {
             use Key::{ArrowLeft, ArrowRight, Character};
-            window.set_title(&format!("{:?}", key));
+            window.set_title(&format!("{key:?}"));
             let state = !modifiers.shift_key();
             match &key {
               // WARNING: Consider using `key_without_modifers()` if available on your platform.

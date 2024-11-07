@@ -8,9 +8,9 @@ pub mod prelude {
   pub use crate::platform_impl::ndk_glue::*;
   pub use tao_macros::{android_fn, generate_package_name};
 }
-use crate::platform_impl::ndk_glue::Rect;
 use crate::{
   event_loop::{EventLoop, EventLoopWindowTarget},
+  platform_impl::ndk_glue::Rect,
   window::{Window, WindowBuilder},
 };
 use ndk::configuration::Configuration;

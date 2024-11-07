@@ -3,17 +3,16 @@ use crate::{
   error::ExternalError,
   window::WindowSizeConstraints,
 };
-use gtk::gdk::{
-  self,
-  prelude::{DeviceExt, SeatExt},
-  Display,
-};
 use gtk::{
+  gdk::{
+    self,
+    prelude::{DeviceExt, SeatExt},
+    Display,
+  },
   glib::{self},
   traits::{GtkWindowExt, WidgetExt},
 };
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 #[inline]
 pub fn cursor_position(is_wayland: bool) -> Result<PhysicalPosition<f64>, ExternalError> {

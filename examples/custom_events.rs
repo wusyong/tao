@@ -40,7 +40,7 @@ fn main() {
     *control_flow = ControlFlow::Wait;
 
     match event {
-      Event::UserEvent(event) => println!("user event: {:?}", event),
+      Event::UserEvent(event) => println!("user event: {event:?}"),
       Event::WindowEvent {
         event: WindowEvent::CloseRequested,
         ..

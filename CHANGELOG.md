@@ -1,5 +1,23 @@
 # Changelog
 
+## \[0.30.5]
+
+- [`532b5ab0`](https://github.com/tauri-apps/tao/commit/532b5ab0bffb1e7b39281951848947feb0716f0a) ([#1000](https://github.com/tauri-apps/tao/pull/1000) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) Fix `android_binding` macro incorrect expansion.
+- [`67e44e4c`](https://github.com/tauri-apps/tao/commit/67e44e4cb2d278333abe367f23f0e5ef0d2463db) ([#991](https://github.com/tauri-apps/tao/pull/991) by [@Legend-Master](https://github.com/tauri-apps/tao/../../Legend-Master)) Fix setting theme to `None` crashes the app on macOS
+
+## \[0.30.4]
+
+- [`b404cde1`](https://github.com/tauri-apps/tao/commit/b404cde150eb767026122691aed2d21f9d6fd051) ([#995](https://github.com/tauri-apps/tao/pull/995) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) Add `WindowAttributes::background_color`, `WindowBuilder::with_background_color`, and `Window::set_background_color` APIs to set and change window background color.
+
+## \[0.30.3]
+
+- [`4dcd2312`](https://github.com/tauri-apps/tao/commit/4dcd231209db80a49b3403c01966026cee975b00) ([#979](https://github.com/tauri-apps/tao/pull/979) by [@Zamoca42](https://github.com/tauri-apps/tao/../../Zamoca42)) On Linux Wayland, changed the event handling for maximizing to process events sequentially to avoid "Error 71(Protocol error): dispatching to Wayland display".
+- [`2ee007a5`](https://github.com/tauri-apps/tao/commit/2ee007a56a86980d329745eaf7b748fbf30edeac) ([#981](https://github.com/tauri-apps/tao/pull/981) by [@thep0y](https://github.com/tauri-apps/tao/../../thep0y)) Add `Window::is_always_on_top` method to check if a window is always on top on macOS, Linux and Windows.
+- [`4dcd2312`](https://github.com/tauri-apps/tao/commit/4dcd231209db80a49b3403c01966026cee975b00) ([#979](https://github.com/tauri-apps/tao/pull/979) by [@Zamoca42](https://github.com/tauri-apps/tao/../../Zamoca42)) On Linux Wayland, fixed an issue where the window was not moving when dragging the header bar area.
+- [`4dcd2312`](https://github.com/tauri-apps/tao/commit/4dcd231209db80a49b3403c01966026cee975b00) ([#979](https://github.com/tauri-apps/tao/pull/979) by [@Zamoca42](https://github.com/tauri-apps/tao/../../Zamoca42)) On Linux Wayland, fixed an issue where the window was not resizing when dragging the window borders.
+- [`4dcd2312`](https://github.com/tauri-apps/tao/commit/4dcd231209db80a49b3403c01966026cee975b00) ([#979](https://github.com/tauri-apps/tao/pull/979) by [@Zamoca42](https://github.com/tauri-apps/tao/../../Zamoca42)) On Linux Wayland, added buttons for maximize and minimize in the title bar.
+- [`2fffdc9d`](https://github.com/tauri-apps/tao/commit/2fffdc9db73edbd529f4c3cf889b33029cefd955) ([#983](https://github.com/tauri-apps/tao/pull/983) by [@Legend-Master](https://github.com/tauri-apps/tao/../../Legend-Master)) Fix blinking title bar when changing system settings on Windows
+
 ## \[0.30.2]
 
 - [`016e122c`](https://github.com/tauri-apps/tao/commit/016e122c5f10eb61f8abe052a888950a460e0804) ([#978](https://github.com/tauri-apps/tao/pull/978) by [@Legend-Master](https://github.com/tauri-apps/tao/../../Legend-Master)) Fix changing the theme activates the window on Windows

@@ -50,7 +50,7 @@ fn main() {
       Event::WindowEvent {
         event, window_id, ..
       } if event == WindowEvent::CloseRequested => {
-        println!("Window {:?} has received the signal to close", window_id);
+        println!("Window {window_id:?} has received the signal to close");
         // This drop the window, causing it to close.
         windows.remove(&window_id);
         if windows.is_empty() {

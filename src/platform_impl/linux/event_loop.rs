@@ -161,6 +161,16 @@ impl<T> EventLoopWindowTarget<T> {
   }
 
   #[inline]
+  pub fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) {
+    if let Err(e) = self.window_requests_tx.send((
+      WindowId::dummy(),
+      WindowRequest::BadgeCount(count, desktop_filename),
+    )) {
+      log::warn!("Fail to send update progress bar request: {e}");
+    }
+  }
+
+  #[inline]
   pub fn set_theme(&self, theme: Option<Theme>) {
     if let Err(e) = self
       .window_requests_tx
@@ -368,6 +378,28 @@ impl<T: 'static> EventLoop<T> {
             window.set_skip_taskbar_hint(skip);
             window.set_skip_pager_hint(skip)
           }
+          WindowRequest::BackgroundColor(css_provider, color) => {
+            unsafe { window.set_data("background_color", color) };
+
+            let style_context = window.style_context();
+            style_context.remove_provider(&css_provider);
+
+            if let Some(color) = color {
+              let theme = format!(
+                r#"
+                  window {{
+                    background-color:  rgba({},{},{},{});
+                    }}
+                    "#,
+                color.0,
+                color.1,
+                color.2,
+                color.3 as f64 / 255.0
+              );
+              let _ = css_provider.load_from_data(theme.as_bytes());
+              style_context.add_provider(&css_provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+            };
+          }
           WindowRequest::SetVisibleOnAllWorkspaces(visible) => {
             if visible {
               window.stick();
@@ -410,6 +442,7 @@ impl<T: 'static> EventLoop<T> {
             };
           }
           WindowRequest::ProgressBarState(_) => unreachable!(),
+          WindowRequest::BadgeCount(_, _) => unreachable!(),
           WindowRequest::SetTheme(_) => unreachable!(),
           WindowRequest::WireUpEvents {
             transparent,
@@ -557,7 +590,10 @@ impl<T: 'static> EventLoop<T> {
             window.connect_configure_event(move |window, event| {
               let scale_factor = window.scale_factor();
 
-              let (x, y) = event.position();
+              let (x, y) = window
+                .window()
+                .map(|w| w.root_origin())
+                .unwrap_or_else(|| event.position());
               if let Err(e) = tx_clone.send(Event::WindowEvent {
                 window_id: RootWindowId(id),
                 event: WindowEvent::Moved(
@@ -860,15 +896,36 @@ impl<T: 'static> EventLoop<T> {
 
             // Receive draw events of the window.
             let draw_clone = draw_tx.clone();
-            window.connect_draw(move |_, cr| {
+            window.connect_draw(move |window, cr| {
               if let Err(e) = draw_clone.send(id) {
                 log::warn!("Failed to send redraw event to event channel: {}", e);
               }
 
               if transparent {
-                cr.set_source_rgba(0., 0., 0., 0.);
+                let background_color = unsafe {
+                  window
+                    .data::<Option<crate::window::RGBA>>("background_color")
+                    .and_then(|c| c.as_ref().clone())
+                };
+
+                let rgba = background_color
+                  .map(|(r, g, b, a)| (r as f64, g as f64, b as f64, a as f64 / 255.0))
+                  .unwrap_or((0., 0., 0., 0.));
+
+                let rect = window
+                  .child()
+                  .map(|c| c.allocation())
+                  .unwrap_or_else(|| window.allocation());
+
+                cr.rectangle(
+                  rect.x() as _,
+                  rect.y() as _,
+                  rect.width() as _,
+                  rect.height() as _,
+                );
+                cr.set_source_rgba(rgba.0, rgba.1, rgba.2, rgba.3);
                 cr.set_operator(cairo::Operator::Source);
-                let _ = cr.paint();
+                let _ = cr.fill();
                 cr.set_operator(cairo::Operator::Over);
               }
 
@@ -880,6 +937,9 @@ impl<T: 'static> EventLoop<T> {
         match request {
           WindowRequest::ProgressBarState(state) => {
             taskbar.update(state);
+          }
+          WindowRequest::BadgeCount(count, desktop_filename) => {
+            taskbar.update_count(count, desktop_filename);
           }
           WindowRequest::SetTheme(theme) => {
             if let Some(settings) = Settings::default() {
@@ -1130,8 +1190,7 @@ fn assert_is_main_thread(suggested_method: &str) {
     is_main_thread(),
     "Initializing the event loop outside of the main thread is a significant \
              cross-platform compatibility hazard. If you really, absolutely need to create an \
-             EventLoop on a different thread, please use the `EventLoopExtUnix::{}` function.",
-    suggested_method
+             EventLoop on a different thread, please use the `EventLoopExtUnix::{suggested_method}` function."
   );
 }
 

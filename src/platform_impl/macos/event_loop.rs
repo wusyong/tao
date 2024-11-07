@@ -28,15 +28,17 @@ use crate::{
   event::Event,
   event_loop::{ControlFlow, EventLoopClosed, EventLoopWindowTarget as RootWindowTarget},
   monitor::MonitorHandle as RootMonitorHandle,
-  platform_impl::platform::{
-    app::APP_CLASS,
-    app_delegate::APP_DELEGATE_CLASS,
-    app_state::AppState,
-    monitor::{self, MonitorHandle},
-    observer::*,
-    util::{self, IdRef},
+  platform_impl::{
+    platform::{
+      app::APP_CLASS,
+      app_delegate::APP_DELEGATE_CLASS,
+      app_state::AppState,
+      monitor::{self, MonitorHandle},
+      observer::*,
+      util::{self, IdRef},
+    },
+    set_badge_label, set_progress_indicator,
   },
-  platform_impl::set_progress_indicator,
   window::{ProgressBarState, Theme},
 };
 
@@ -121,6 +123,16 @@ impl<T: 'static> EventLoopWindowTarget<T> {
   #[inline]
   pub fn set_progress_bar(&self, progress: ProgressBarState) {
     set_progress_indicator(progress);
+  }
+
+  #[inline]
+  pub fn set_badge_count(&self, count: Option<i64>, _desktop_filename: Option<String>) {
+    set_badge_label(count.map(|c| c.to_string()));
+  }
+
+  #[inline]
+  pub fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
   }
 
   #[inline]

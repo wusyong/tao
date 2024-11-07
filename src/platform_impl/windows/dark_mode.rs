@@ -119,7 +119,11 @@ fn refresh_immersive_color_policy_state() {
 
 /// Attempt to set a theme on a window, if necessary.
 /// Returns the theme that was picked
-pub fn try_window_theme(hwnd: HWND, preferred_theme: Option<Theme>) -> Theme {
+pub fn try_window_theme(
+  hwnd: HWND,
+  preferred_theme: Option<Theme>,
+  redraw_title_bar: bool,
+) -> Theme {
   if *DARK_MODE_SUPPORTED {
     let is_dark_mode = match preferred_theme {
       Some(theme) => theme == Theme::Dark,
@@ -131,7 +135,7 @@ pub fn try_window_theme(hwnd: HWND, preferred_theme: Option<Theme>) -> Theme {
       false => Theme::Light,
     };
 
-    refresh_titlebar_theme_color(hwnd, is_dark_mode);
+    refresh_titlebar_theme_color(hwnd, is_dark_mode, redraw_title_bar);
 
     theme
   } else {
@@ -161,7 +165,7 @@ pub fn allow_dark_mode_for_window(hwnd: HWND, is_dark_mode: bool) {
   }
 }
 
-fn refresh_titlebar_theme_color(hwnd: HWND, is_dark_mode: bool) {
+fn refresh_titlebar_theme_color(hwnd: HWND, is_dark_mode: bool, redraw_title_bar: bool) {
   if let Some(ver) = *WIN10_BUILD_VERSION {
     if ver < 17763 {
       let mut is_dark_mode_bigbool: i32 = is_dark_mode.into();
@@ -187,12 +191,14 @@ fn refresh_titlebar_theme_color(hwnd: HWND, is_dark_mode: bool) {
           &dark_mode as *const BOOL as *const c_void,
           std::mem::size_of::<BOOL>() as u32,
         );
-        if GetActiveWindow() == hwnd {
-          DefWindowProcW(hwnd, WM_NCACTIVATE, None, None);
-          DefWindowProcW(hwnd, WM_NCACTIVATE, WPARAM(true.into()), None);
-        } else {
-          DefWindowProcW(hwnd, WM_NCACTIVATE, WPARAM(true.into()), None);
-          DefWindowProcW(hwnd, WM_NCACTIVATE, None, None);
+        if redraw_title_bar {
+          if GetActiveWindow() == hwnd {
+            DefWindowProcW(hwnd, WM_NCACTIVATE, None, None);
+            DefWindowProcW(hwnd, WM_NCACTIVATE, WPARAM(true.into()), None);
+          } else {
+            DefWindowProcW(hwnd, WM_NCACTIVATE, WPARAM(true.into()), None);
+            DefWindowProcW(hwnd, WM_NCACTIVATE, None, None);
+          }
         }
       }
     }

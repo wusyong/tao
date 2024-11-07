@@ -27,7 +27,7 @@ fn main() {
   });
 
   event_loop.run(move |event, _, control_flow| {
-    println!("{:?}", event);
+    println!("{event:?}");
 
     *control_flow = ControlFlow::Wait;
 

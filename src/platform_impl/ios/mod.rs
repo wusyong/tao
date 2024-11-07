@@ -74,6 +74,7 @@ macro_rules! assert_main_thread {
 }
 
 mod app_state;
+mod badge;
 mod event_loop;
 mod ffi;
 mod keycode;
@@ -90,8 +91,8 @@ pub use self::{
   monitor::{MonitorHandle, VideoMode},
   window::{PlatformSpecificWindowBuilderAttributes, Window, WindowId},
 };
-
 pub(crate) use crate::icon::NoIcon as PlatformIcon;
+pub(crate) use badge::set_badge_count;
 
 // todo: implement iOS keyboard event
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]

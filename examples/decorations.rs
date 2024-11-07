@@ -40,7 +40,7 @@ fn main() {
           ..
         } => {
           decorations = !decorations;
-          println!("Decorations: {}", decorations);
+          println!("Decorations: {decorations}");
           window.set_decorations(decorations);
         }
         _ => (),

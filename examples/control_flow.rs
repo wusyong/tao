@@ -44,7 +44,7 @@ fn main() {
 
   event_loop.run(move |event, _, control_flow| {
     use tao::event::StartCause;
-    println!("{:?}", event);
+    println!("{event:?}");
     match event {
       Event::NewEvents(start_cause) => {
         wait_cancelled = match start_cause {
@@ -69,19 +69,19 @@ fn main() {
           // See the `key_binding` example
           if Key::Character("1") == logical_key {
             mode = Mode::Wait;
-            println!("\nmode: {:?}\n", mode);
+            println!("\nmode: {mode:?}\n");
           }
           if Key::Character("2") == logical_key {
             mode = Mode::WaitUntil;
-            println!("\nmode: {:?}\n", mode);
+            println!("\nmode: {mode:?}\n");
           }
           if Key::Character("3") == logical_key {
             mode = Mode::Poll;
-            println!("\nmode: {:?}\n", mode);
+            println!("\nmode: {mode:?}\n");
           }
           if Key::Character("r") == logical_key {
             request_redraw = !request_redraw;
-            println!("\nrequest_redraw: {}\n", request_redraw);
+            println!("\nrequest_redraw: {request_redraw}\n");
           }
           if Key::Escape == logical_key {
             close_requested = true;

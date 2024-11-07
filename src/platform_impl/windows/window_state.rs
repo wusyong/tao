@@ -7,7 +7,7 @@ use crate::{
   icon::Icon,
   keyboard::ModifiersState,
   platform_impl::platform::{event_loop, minimal_ime::MinimalIme, util},
-  window::{CursorIcon, Fullscreen, Theme, WindowAttributes, WindowSizeConstraints},
+  window::{CursorIcon, Fullscreen, Theme, WindowAttributes, WindowSizeConstraints, RGBA},
 };
 use parking_lot::MutexGuard;
 use std::io;
@@ -46,6 +46,8 @@ pub struct WindowState {
   // Used by WM_NCACTIVATE, WM_SETFOCUS and WM_KILLFOCUS
   pub is_active: bool,
   pub is_focused: bool,
+
+  pub background_color: Option<RGBA>,
 }
 
 unsafe impl Send for WindowState {}
@@ -126,6 +128,7 @@ impl WindowState {
     scale_factor: f64,
     current_theme: Theme,
     preferred_theme: Option<Theme>,
+    background_color: Option<RGBA>,
   ) -> WindowState {
     WindowState {
       mouse: MouseProperties {
@@ -155,6 +158,8 @@ impl WindowState {
       window_flags: WindowFlags::empty(),
       is_active: false,
       is_focused: false,
+
+      background_color,
     }
   }
 

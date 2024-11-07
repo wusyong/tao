@@ -10,7 +10,7 @@ use crate::{
   dpi::{LogicalSize, Position},
   event_loop::{EventLoop, EventLoopWindowTarget},
   monitor::MonitorHandle,
-  platform_impl::{get_aux_state_mut, Parent},
+  platform_impl::{get_aux_state_mut, set_badge_label, Parent},
   window::{Window, WindowBuilder},
 };
 
@@ -84,6 +84,9 @@ pub trait WindowExtMacOS {
   ///
   /// <https://developer.apple.com/documentation/appkit/nswindow/1419167-titlebarappearstransparent>
   fn set_titlebar_transparent(&self, transparent: bool);
+
+  /// Sets the badge label on the taskbar
+  fn set_badge_label(&self, label: Option<String>);
 }
 
 impl WindowExtMacOS for Window {
@@ -160,6 +163,11 @@ impl WindowExtMacOS for Window {
   #[inline]
   fn set_titlebar_transparent(&self, transparent: bool) {
     self.window.set_titlebar_transparent(transparent);
+  }
+
+  #[inline]
+  fn set_badge_label(&self, label: Option<String>) {
+    self.window.set_badge_label(label);
   }
 }
 
@@ -388,6 +396,9 @@ pub trait EventLoopWindowTargetExtMacOS {
   /// To set the activation policy before the app starts running, see
   /// [`EventLoopExtMacOS::set_activation_policy`](crate::platform::macos::EventLoopExtMacOS::set_activation_policy).
   fn set_activation_policy_at_runtime(&self, activation_policy: ActivationPolicy);
+
+  /// Sets the badge label on macos dock
+  fn set_badge_label(&self, label: Option<String>);
 }
 
 impl<T> EventLoopWindowTargetExtMacOS for EventLoopWindowTarget<T> {
@@ -414,5 +425,9 @@ impl<T> EventLoopWindowTargetExtMacOS for EventLoopWindowTarget<T> {
     let app: cocoa::base::id = unsafe { msg_send![cls, sharedApplication] };
     let ns_activation_policy: NSApplicationActivationPolicy = activation_policy.into();
     unsafe { msg_send![app, setActivationPolicy: ns_activation_policy] }
+  }
+
+  fn set_badge_label(&self, label: Option<String>) {
+    set_badge_label(label);
   }
 }

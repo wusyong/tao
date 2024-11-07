@@ -825,7 +825,7 @@ impl fmt::Display for KeyCode {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       &KeyCode::Unidentified(_) => write!(f, "{:?}", "Unidentified"),
-      val => write!(f, "{:?}", val),
+      val => write!(f, "{val:?}"),
     }
   }
 }

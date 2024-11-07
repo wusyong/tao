@@ -51,11 +51,14 @@ use crate::{
   },
   window::{
     CursorIcon, Fullscreen, ProgressBarState, ProgressState, ResizeDirection, Theme,
-    UserAttentionType, WindowAttributes, WindowSizeConstraints,
+    UserAttentionType, WindowAttributes, WindowSizeConstraints, RGBA,
   },
 };
 
-use super::keyboard::{KeyEventBuilder, KEY_EVENT_BUILDERS};
+use super::{
+  event_loop::CHANGE_THEME_MSG_ID,
+  keyboard::{KeyEventBuilder, KEY_EVENT_BUILDERS},
+};
 
 /// A simple non-owning wrapper around a window.
 #[derive(Clone, Copy)]
@@ -940,7 +943,7 @@ impl Window {
       }
       window_state.preferred_theme = theme;
     }
-    unsafe { SendMessageW(self.hwnd(), WM_SETTINGCHANGE, WPARAM(0), LPARAM(0)) };
+    unsafe { SendMessageW(self.hwnd(), *CHANGE_THEME_MSG_ID, WPARAM(0), LPARAM(0)) };
   }
 
   #[inline]
@@ -980,6 +983,16 @@ impl Window {
   }
 
   #[inline]
+  pub fn set_background_color(&self, color: Option<RGBA>) {
+    self.window_state.lock().background_color = color;
+
+    unsafe {
+      let _ = InvalidateRect(self.hwnd(), None, true);
+      let _ = UpdateWindow(self.hwnd());
+    }
+  }
+
+  #[inline]
   pub fn set_progress_bar(&self, progress: ProgressBarState) {
     unsafe {
       let taskbar_list: ITaskbarList = CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap();
@@ -1007,6 +1020,22 @@ impl Window {
           .SetProgressValue(handle, value, 100)
           .unwrap_or(());
       }
+    }
+  }
+
+  #[inline]
+  pub fn set_overlay_icon(&self, icon: Option<&Icon>) {
+    let taskbar: ITaskbarList =
+      unsafe { CoCreateInstance(&TaskbarList, None, CLSCTX_SERVER).unwrap() };
+
+    let icon = icon
+      .map(|i| i.inner.as_raw_handle())
+      .unwrap_or(HICON::default());
+
+    unsafe {
+      taskbar
+        .SetOverlayIcon(self.window.0, icon, None)
+        .unwrap_or(());
     }
   }
 
@@ -1163,6 +1192,7 @@ unsafe fn init<T: 'static>(
     attributes
       .preferred_theme
       .or(*event_loop.preferred_theme.lock()),
+    false,
   );
 
   let window_state = {
@@ -1172,6 +1202,7 @@ unsafe fn init<T: 'static>(
       scale_factor,
       current_theme,
       attributes.preferred_theme,
+      attributes.background_color,
     );
     let window_state = Arc::new(Mutex::new(window_state));
     WindowState::set_window_flags(window_state.lock(), real_window.0, |f| *f = window_flags);

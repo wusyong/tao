@@ -124,7 +124,7 @@ fn main() {
         "r" => {
           resizable = !resizable;
           window.set_resizable(resizable);
-          println!("Resizable: {}", resizable);
+          println!("Resizable: {resizable}");
         }
         "m" => {
           window.set_minimized(!window.is_minimized());
