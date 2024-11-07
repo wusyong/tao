@@ -117,14 +117,15 @@ impl Window {
       .unwrap_or((800, 600));
 
     let window_clone = window.clone();
-    glib::idle_add_local_once(move || {
+    glib::idle_add_local_full(glib::Priority::HIGH_IDLE, move || {
       window_clone.set_default_size(min_width, min_height);
       window_clone.resize(width, height);
+      glib::ControlFlow::Break
     });
 
     if attributes.maximized {
       let maximize_process = util::WindowMaximizeProcess::new(window.clone(), attributes.resizable);
-      glib::idle_add_local_full(glib::Priority::DEFAULT_IDLE, move || {
+      glib::idle_add_local_full(glib::Priority::HIGH_IDLE, move || {
         let mut maximize_process = maximize_process.borrow_mut();
         maximize_process.next_step()
       });

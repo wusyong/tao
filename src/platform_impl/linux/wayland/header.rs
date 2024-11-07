@@ -26,10 +26,11 @@ impl WlHeader {
 
     let header_clone = header.clone();
     let event_box_clone = event_box.clone();
-    glib::idle_add_local_once(move || {
+    glib::idle_add_local_full(glib::Priority::HIGH_IDLE, move || {
       let allocated_height = header_clone.allocated_height();
       event_box_clone.set_size_request(min_width, allocated_height);
       header_clone.set_size_request(min_width, allocated_height);
+      glib::ControlFlow::Break
     });
 
     header.set_custom_title(Some(&title_label));
