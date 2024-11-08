@@ -16,6 +16,7 @@ use ndk::{
 };
 use once_cell::sync::{Lazy, OnceCell};
 use std::{
+  cell::RefCell,
   ffi::{CStr, CString},
   fs::File,
   io::{BufRead, BufReader},
@@ -104,13 +105,26 @@ pub fn android_log(level: Level, tag: &CStr, msg: &CStr) {
   }
 }
 
-static WINDOW_MANGER: OnceCell<GlobalRef> = OnceCell::new();
+pub(crate) struct StaticCell<T>(RefCell<T>);
+
+unsafe impl<T> Send for StaticCell<T> {}
+unsafe impl<T> Sync for StaticCell<T> {}
+
+impl<T> std::ops::Deref for StaticCell<T> {
+  type Target = RefCell<T>;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+static WINDOW_MANAGER: StaticCell<Option<GlobalRef>> = StaticCell(RefCell::new(None));
 static INPUT_QUEUE: Lazy<RwLock<Option<InputQueue>>> = Lazy::new(|| Default::default());
 static CONTENT_RECT: Lazy<RwLock<Rect>> = Lazy::new(|| Default::default());
 static LOOPER: Lazy<Mutex<Option<ForeignLooper>>> = Lazy::new(|| Default::default());
 
-pub fn window_manager() -> Option<&'static GlobalRef> {
-  WINDOW_MANGER.get()
+pub fn window_manager() -> std::cell::Ref<'static, Option<GlobalRef>> {
+  WINDOW_MANAGER.0.borrow()
 }
 
 pub fn input_queue() -> RwLockReadGuard<'static, Option<InputQueue>> {
@@ -198,7 +212,7 @@ pub unsafe fn create(
     .l()
     .unwrap();
   let window_manager = env.new_global_ref(window_manager).unwrap();
-  WINDOW_MANGER.get_or_init(move || window_manager);
+  WINDOW_MANAGER.replace(Some(window_manager));
   let activity = env.new_global_ref(jobject).unwrap();
   let vm = env.get_java_vm().unwrap();
   let env = vm.attach_current_thread_as_daemon().unwrap();
@@ -305,6 +319,7 @@ pub unsafe fn save(_: JNIEnv, _: JClass, _: JObject) {
 pub unsafe fn destroy(_: JNIEnv, _: JClass, _: JObject) {
   wake(Event::Destroy);
   ndk_context::release_android_context();
+  WINDOW_MANAGER.take();
 }
 
 pub unsafe fn memory(_: JNIEnv, _: JClass, _: JObject) {
