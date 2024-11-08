@@ -728,7 +728,7 @@ impl Window {
   #[cfg(feature = "rwh_06")]
   pub fn raw_window_handle_rwh_06(&self) -> Result<rwh_06::RawWindowHandle, rwh_06::HandleError> {
     // TODO: Use main activity instead?
-    if let Some(w) = ndk_glue::window_manager() {
+    if let Some(w) = ndk_glue::window_manager().as_ref() {
       let native_window =
         unsafe { std::ptr::NonNull::new_unchecked(w.as_obj().as_raw() as *mut _) };
       // native_window shuldn't be null
@@ -780,7 +780,7 @@ impl MonitorHandle {
 
   pub fn size(&self) -> PhysicalSize<u32> {
     // TODO decide how to get JNIENV
-    if let Some(w) = ndk_glue::window_manager() {
+    if let Some(w) = ndk_glue::window_manager().as_ref() {
       let ctx = ndk_context::android_context();
       let vm = unsafe { jni::JavaVM::from_raw(ctx.vm().cast()) }.unwrap();
       let mut env = vm.attach_current_thread().unwrap();
