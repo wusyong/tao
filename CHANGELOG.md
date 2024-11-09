@@ -1,5 +1,13 @@
 # Changelog
 
+## \[0.30.6]
+
+- [`1f72c246`](https://github.com/tauri-apps/tao/commit/1f72c2465edcc9bee9170bcfd74d4e917e48febc) ([#1002](https://github.com/tauri-apps/tao/pull/1002) by [@ahqsoftwares](https://github.com/tauri-apps/tao/../../ahqsoftwares)) Add `WindowExtUnix::set_badge_count` for Linux, `WindowExtIos::set_badge_count` for iOS, `WindowExtMacos::set_badge_label` for Macos, `MacdowExtWindows::set_overlay_icon` for Windows
+- [`946f8049`](https://github.com/tauri-apps/tao/commit/946f804995208fd9796d6baee828392c4ce2056b) ([#1005](https://github.com/tauri-apps/tao/pull/1005) by [@lucasfernog](https://github.com/tauri-apps/tao/../../lucasfernog)) Fix memory leak on Android.
+- [`aff33fbb`](https://github.com/tauri-apps/tao/commit/aff33fbb2dab66cca2481fb75a3a6d612689269c) ([#1001](https://github.com/tauri-apps/tao/pull/1001) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Linux, `Window::outer_position`, `Window::outer_size` and `WindowEvent::Moved` to include/account for borders and titlebar.
+- [`06d109fe`](https://github.com/tauri-apps/tao/commit/06d109feb3fd0f77004c8c576fc1e54e7e82f867) ([#993](https://github.com/tauri-apps/tao/pull/993) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `Window::inner_size` returns slightly larger than what's visible for undecorated windows but have shadows.
+- [`edfbd364`](https://github.com/tauri-apps/tao/commit/edfbd364a6abf8704de53a31ab10d0ce595cbde7) ([#992](https://github.com/tauri-apps/tao/pull/992) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `WindowBuilder::with_position` with a position on a non-primary monitor resulting in an incorrectly positioned window.
+
 ## \[0.30.5]
 
 - [`532b5ab0`](https://github.com/tauri-apps/tao/commit/532b5ab0bffb1e7b39281951848947feb0716f0a) ([#1000](https://github.com/tauri-apps/tao/pull/1000) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) Fix `android_binding` macro incorrect expansion.
