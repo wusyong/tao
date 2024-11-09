@@ -1155,15 +1155,59 @@ unsafe fn init<T: 'static>(
   let real_window = {
     let (style, ex_style) = window_flags.to_window_styles();
     let title = util::encode_wide(&attributes.title);
+
+    let primary_monitor = event_loop.primary_monitor().map(|m| m.inner);
+
+    let position = attributes.position.map(|p| {
+      p.to_logical::<f64>(
+        primary_monitor
+          .as_ref()
+          .map(|m| m.scale_factor())
+          .unwrap_or(1.0),
+      )
+    });
+
+    let default_scale_factor = position
+      .and_then(|p| event_loop.monitor_from_point(p.x, p.y))
+      .or_else(|| primary_monitor)
+      .map(|m| m.scale_factor())
+      .unwrap_or(1.0);
+
+    let desired_size = attributes
+      .inner_size
+      .unwrap_or_else(|| PhysicalSize::new(800, 600).into());
+    let clamped_size = attributes
+      .inner_size_constraints
+      .clamp(desired_size, default_scale_factor);
+
+    let position = position
+      .map(|p| p.into())
+      .unwrap_or((CW_USEDEFAULT, CW_USEDEFAULT));
+
+    // Best effort: try to create the window with the requested inner size
+    let adjusted_size = {
+      let (w, h): (i32, i32) = clamped_size.to_physical::<u32>(default_scale_factor).into();
+      let mut rect = RECT {
+        left: 0,
+        top: 0,
+        right: w,
+        bottom: h,
+      };
+      unsafe {
+        AdjustWindowRectEx(&mut rect, style, pl_attribs.menu.is_some(), ex_style)?;
+      }
+      (rect.right - rect.left, rect.bottom - rect.top)
+    };
+
     let handle = CreateWindowExW(
       ex_style,
       PCWSTR::from_raw(class_name.as_ptr()),
       PCWSTR::from_raw(title.as_ptr()),
       style,
-      CW_USEDEFAULT,
-      CW_USEDEFAULT,
-      CW_USEDEFAULT,
-      CW_USEDEFAULT,
+      position.0,
+      position.1,
+      adjusted_size.0,
+      adjusted_size.1,
       parent.unwrap_or_default(),
       pl_attribs.menu.unwrap_or_default(),
       GetModuleHandleW(PCWSTR::null()).unwrap_or_default(),
@@ -1248,20 +1292,8 @@ unsafe fn init<T: 'static>(
   if attributes.fullscreen.is_some() {
     win.set_fullscreen(attributes.fullscreen);
     force_window_active(win.window.0);
-  } else {
-    let desired_size = attributes
-      .inner_size
-      .unwrap_or_else(|| PhysicalSize::new(800, 600).into());
-    let size = attributes
-      .inner_size_constraints
-      .clamp(desired_size, win.scale_factor());
-    win.set_inner_size(size);
-
-    if attributes.maximized {
-      // Need to set MAXIMIZED after setting `inner_size` as
-      // `Window::set_inner_size` changes MAXIMIZED to false.
-      win.set_maximized(true);
-    }
+  } else if attributes.maximized {
+    win.set_maximized(true);
   }
 
   if attributes.content_protection {
@@ -1270,10 +1302,6 @@ unsafe fn init<T: 'static>(
 
   win.set_visible(attributes.visible);
   win.set_closable(attributes.closable);
-
-  if let Some(position) = attributes.position {
-    win.set_outer_position(position);
-  }
 
   Ok(win)
 }
