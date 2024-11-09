@@ -244,10 +244,32 @@ impl Window {
     if unsafe { GetClientRect(self.window.0, &mut rect) }.is_err() {
       panic!("Unexpected GetClientRect failure")
     }
-    PhysicalSize::new(
-      (rect.right - rect.left) as u32,
-      (rect.bottom - rect.top) as u32,
-    )
+
+    let mut width = rect.right - rect.left;
+    let mut height = rect.bottom - rect.top;
+
+    let window_state = self.window_state.lock();
+
+    if window_state
+      .window_flags
+      .contains(WindowFlags::MARKER_UNDECORATED_SHADOW)
+    {
+      let mut pt: POINT = unsafe { mem::zeroed() };
+      if unsafe { ClientToScreen(self.hwnd(), &mut pt) }.as_bool() == true {
+        let mut window_rc: RECT = unsafe { mem::zeroed() };
+        if unsafe { GetWindowRect(self.hwnd(), &mut window_rc) }.is_ok() {
+          let left_b = pt.x - window_rc.left;
+          let right_b = pt.x + width - window_rc.right;
+          let top_b = pt.y - window_rc.top;
+          let bottom_b = pt.y + height - window_rc.bottom;
+
+          width = width - left_b - right_b;
+          height = height - top_b - bottom_b;
+        }
+      }
+    }
+
+    PhysicalSize::new(width as u32, height as u32)
   }
 
   #[inline]
@@ -1314,6 +1336,8 @@ unsafe extern "system" fn window_proc(
           let params = &mut *(lparam.0 as *mut NCCALCSIZE_PARAMS);
           params.rgrc[0].top += 1;
           params.rgrc[0].bottom += 1;
+          params.rgrc[0].left += 1;
+          params.rgrc[0].right += 1;
         }
         return LRESULT(0); // return 0 here to make the window borderless
       }

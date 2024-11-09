@@ -2145,6 +2145,8 @@ unsafe fn public_window_callback_inner<T: 'static>(
           let params = &mut *(lparam.0 as *mut NCCALCSIZE_PARAMS);
           params.rgrc[0].top += 1;
           params.rgrc[0].bottom += 1;
+          params.rgrc[0].left += 1;
+          params.rgrc[0].right += 1;
         }
         result = ProcResult::Value(LRESULT(0)); // return 0 here to make the window borderless
       }
