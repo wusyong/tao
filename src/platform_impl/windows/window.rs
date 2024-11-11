@@ -248,11 +248,10 @@ impl Window {
     let mut width = rect.right - rect.left;
     let mut height = rect.bottom - rect.top;
 
-    let window_state = self.window_state.lock();
+    let window_flags = self.window_state.lock().window_flags();
 
-    if window_state
-      .window_flags
-      .contains(WindowFlags::MARKER_UNDECORATED_SHADOW)
+    if window_flags.contains(WindowFlags::MARKER_UNDECORATED_SHADOW)
+      && !window_flags.contains(WindowFlags::MARKER_DECORATIONS)
     {
       let mut pt: POINT = unsafe { mem::zeroed() };
       if unsafe { ClientToScreen(self.hwnd(), &mut pt) }.as_bool() == true {
@@ -287,14 +286,29 @@ impl Window {
   #[inline]
   pub fn set_inner_size(&self, size: Size) {
     let scale_factor = self.scale_factor();
-    let (width, height) = size.to_physical::<u32>(scale_factor).into();
+    let (mut width, mut height) = size.to_physical::<i32>(scale_factor).into();
 
     let window_state = Arc::clone(&self.window_state);
 
-    let is_decorated = window_state
-      .lock()
-      .window_flags
-      .contains(WindowFlags::MARKER_DECORATIONS);
+    let window_flags = self.window_state.lock().window_flags();
+
+    let is_decorated = window_flags.contains(WindowFlags::MARKER_DECORATIONS);
+
+    if window_flags.contains(WindowFlags::MARKER_UNDECORATED_SHADOW) && !is_decorated {
+      let mut pt: POINT = unsafe { mem::zeroed() };
+      if unsafe { ClientToScreen(self.hwnd(), &mut pt) }.as_bool() == true {
+        let mut window_rc: RECT = unsafe { mem::zeroed() };
+        if unsafe { GetWindowRect(self.hwnd(), &mut window_rc) }.is_ok() {
+          let left_b = pt.x - window_rc.left;
+          let right_b = pt.x + width - window_rc.right;
+          let top_b = pt.y - window_rc.top;
+          let bottom_b = pt.y + height - window_rc.bottom;
+
+          width = width + (left_b - right_b);
+          height = height + (top_b - bottom_b);
+        }
+      }
+    }
 
     let window = self.window.0 .0 as isize;
     self.thread_executor.execute_in_thread(move || {

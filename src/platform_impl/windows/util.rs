@@ -95,15 +95,15 @@ pub fn adjust_size(hwnd: HWND, size: PhysicalSize<u32>, is_decorated: bool) -> P
   PhysicalSize::new((rect.right - rect.left) as _, (rect.bottom - rect.top) as _)
 }
 
-pub(crate) fn set_inner_size_physical(window: HWND, x: u32, y: u32, is_decorated: bool) {
+pub(crate) fn set_inner_size_physical(window: HWND, x: i32, y: i32, is_decorated: bool) {
   unsafe {
     let rect = adjust_window_rect(
       window,
       RECT {
         top: 0,
         left: 0,
-        bottom: y as i32,
-        right: x as i32,
+        bottom: y,
+        right: x,
       },
       is_decorated,
     )
