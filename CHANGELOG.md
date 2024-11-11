@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.30.8]
+
+- [`c043a8f0`](https://github.com/tauri-apps/tao/commit/c043a8f09ef552fecd077e794c542cf6857deeff) ([#1011](https://github.com/tauri-apps/tao/pull/1011)) Fix compiling on android when using `rwh_05` and `rwh_04` feature flags.
+
 ## \[0.30.7]
 
 - [`97382238`](https://github.com/tauri-apps/tao/commit/97382238b218d66baf5693b6087b7bef2e66ec70) ([#1007](https://github.com/tauri-apps/tao/pull/1007) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `Window::set_inner_size` regression not handling borders correctly for undecorated window with shadows.
