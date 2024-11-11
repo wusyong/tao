@@ -37,8 +37,8 @@
 //! describes what happens in what order.
 //!
 //! [event_loop_run]: crate::event_loop::EventLoop::run
-use instant::Instant;
 use std::path::PathBuf;
+use std::time::Instant;
 
 use crate::{
   dpi::{PhysicalPosition, PhysicalSize},
