@@ -3,8 +3,7 @@ name: version or publish
 on:
   push:
     branches:
-      - dev
-      - v0.16
+      - v0.30
 
 jobs:
   version-or-publish:
@@ -43,8 +42,8 @@ jobs:
         if: steps.covector.outputs.commandRan == 'version'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Publish New Versions"
+          title: "Publish New Versions (0.30)"
           commit-message: "publish new versions"
           labels: "version updates"
-          branch: "release"
+          branch: "release-v0.30"
           body: ${{ steps.covector.outputs.change }}
