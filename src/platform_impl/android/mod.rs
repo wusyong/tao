@@ -700,7 +700,7 @@ impl Window {
   pub fn raw_window_handle_rwh_04(&self) -> rwh_04::RawWindowHandle {
     // TODO: Use main activity instead?
     let mut handle = rwh_04::AndroidNdkHandle::empty();
-    if let Some(w) = ndk_glue::window_manager() {
+    if let Some(w) = ndk_glue::window_manager().as_ref() {
       handle.a_native_window = w.as_obj().as_raw() as *mut _;
     } else {
       panic!("Cannot get the native window, it's null and will always be null before Event::Resumed and after Event::Suspended. Make sure you only call this function between those events.");
@@ -712,7 +712,7 @@ impl Window {
   pub fn raw_window_handle_rwh_05(&self) -> rwh_05::RawWindowHandle {
     // TODO: Use main activity instead?
     let mut handle = rwh_05::AndroidNdkWindowHandle::empty();
-    if let Some(w) = ndk_glue::window_manager() {
+    if let Some(w) = ndk_glue::window_manager().as_ref() {
       handle.a_native_window = w.as_obj().as_raw() as *mut _;
     } else {
       panic!("Cannot get the native window, it's null and will always be null before Event::Resumed and after Event::Suspended. Make sure you only call this function between those events.");
