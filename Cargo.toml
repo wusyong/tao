@@ -34,7 +34,6 @@ serde = [ "dep:serde", "dpi/serde" ]
 members = [ "tao-macros" ]
 
 [dependencies]
-instant = "0.1"
 lazy_static = "1"
 libc = "0.2"
 log = "0.4"
