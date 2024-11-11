@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.31.0]
+
+- [`665eb548`](https://github.com/tauri-apps/tao/commit/665eb54848463010b1a93fe6107ee32b18b26fa6) Fix compiling on android when using `rwh_05` or `rwh_04` feature flags.
+- [`73741a75`](https://github.com/tauri-apps/tao/commit/73741a75409a93267947d92697616437ae4fccb8) ([#1008](https://github.com/tauri-apps/tao/pull/1008)) Remove `instant` dependency, changed `StartCause::ResumeTimeReached`, `StartCause::WaitCancelled` and `ControlFlow::WaitUntil` to use `std::time::Instant` instead.
+
 ## \[0.30.7]
 
 - [`97382238`](https://github.com/tauri-apps/tao/commit/97382238b218d66baf5693b6087b7bef2e66ec70) ([#1007](https://github.com/tauri-apps/tao/pull/1007) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `Window::set_inner_size` regression not handling borders correctly for undecorated window with shadows.
