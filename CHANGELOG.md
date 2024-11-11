@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.30.7]
+
+- [`97382238`](https://github.com/tauri-apps/tao/commit/97382238b218d66baf5693b6087b7bef2e66ec70) ([#1007](https://github.com/tauri-apps/tao/pull/1007) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `Window::set_inner_size` regression not handling borders correctly for undecorated window with shadows.
+- [`97382238`](https://github.com/tauri-apps/tao/commit/97382238b218d66baf5693b6087b7bef2e66ec70) ([#1007](https://github.com/tauri-apps/tao/pull/1007) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `Window::inner_size` regression returning incorrect size for window with decorations.
+
 ## \[0.30.6]
 
 - [`1f72c246`](https://github.com/tauri-apps/tao/commit/1f72c2465edcc9bee9170bcfd74d4e917e48febc) ([#1002](https://github.com/tauri-apps/tao/pull/1002) by [@ahqsoftwares](https://github.com/tauri-apps/tao/../../ahqsoftwares)) Add `WindowExtUnix::set_badge_count` for Linux, `WindowExtIos::set_badge_count` for iOS, `WindowExtMacos::set_badge_label` for Macos, `MacdowExtWindows::set_overlay_icon` for Windows
