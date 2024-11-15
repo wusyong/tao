@@ -286,13 +286,13 @@ unsafe extern "C" fn x_error_callback(
 
 /// Additional methods on `MonitorHandle` that are specific to Unix.
 pub trait MonitorHandleExtUnix {
-  /// Returns the raw handle of the monitor - `gdk::Monitor`.
-  fn gtk_monitor(&self) -> &gtk::gdk::Monitor;
+  /// Returns the raw handle of the monitor - `gtk::Monitor`.
+  fn gtk_monitor(&self) -> &gtk::Monitor;
 }
 
 impl MonitorHandleExtUnix for MonitorHandle {
   #[inline]
-  fn gtk_monitor(&self) -> &gtk::gdk::Monitor {
+  fn gtk_monitor(&self) -> &gtk::Monitor {
     self.monitor
   }
 }
