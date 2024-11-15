@@ -293,6 +293,6 @@ pub trait MonitorHandleExtUnix {
 impl MonitorHandleExtUnix for MonitorHandle {
   #[inline]
   fn gdk_monitor(&self) -> &gtk::gdk::Monitor {
-    self.monitor
+    self.inner.monitor
   }
 }
