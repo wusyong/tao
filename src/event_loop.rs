@@ -13,9 +13,6 @@
 //! [create_proxy]: crate::event_loop::EventLoop::create_proxy
 //! [event_loop_proxy]: crate::event_loop::EventLoopProxy
 //! [send_event]: crate::event_loop::EventLoopProxy::send_event
-use std::time::Instant;
-use std::{error, fmt, marker::PhantomData, ops::Deref};
-use windows::Networking::PushNotifications::PushNotificationChannel;
 use crate::{
   dpi::PhysicalPosition,
   error::ExternalError,
@@ -24,6 +21,9 @@ use crate::{
   platform_impl,
   window::{ProgressBarState, Theme},
 };
+use std::time::Instant;
+use std::{error, fmt, marker::PhantomData, ops::Deref};
+use windows::Networking::PushNotifications::PushNotificationChannel;
 
 /// Provides a way to retrieve events from the system and from the windows that were registered to
 /// the events loop.

@@ -9,12 +9,11 @@ use cocoa::{
   foundation::NSString,
 };
 use objc::{
-  msg_send,
-  sel,
-  sel_impl,
   class,
   declare::ClassDecl,
+  msg_send,
   runtime::{Class, Object, Sel, BOOL},
+  sel, sel_impl,
 };
 use std::{
   cell::{RefCell, RefMut},
@@ -211,14 +210,14 @@ extern "C" fn did_fail_to_register_for_apns(_: &Object, _: Sel, _: id, err: *mut
       let is_error: bool = msg_send![err, isKindOfClass:class!(NSError)];
       if !is_error {
         trace!("Invalid error object type for push registration failure");
-        return
+        return;
       }
 
       // Get the localizedDescription
       let description: *mut Object = msg_send![err, localizedDescription];
       if description.is_null() {
         trace!("Error had no description");
-        return
+        return;
       }
 
       // Convert NSString to str
@@ -234,7 +233,5 @@ extern "C" fn did_fail_to_register_for_apns(_: &Object, _: Sel, _: id, err: *mut
 }
 
 fn get_shared_application() -> *mut Object {
-  unsafe {
-    msg_send![class!(NSApplication), sharedApplication]
-  }
+  unsafe { msg_send![class!(NSApplication), sharedApplication] }
 }

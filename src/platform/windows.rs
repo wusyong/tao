@@ -19,15 +19,11 @@ use windows::Win32::UI::Input::KeyboardAndMouse::*;
 
 #[cfg(feature = "push-notifications")]
 use windows::Networking::PushNotifications::{
-  PushNotificationChannel,
-  PushNotificationChannelManager,
+  PushNotificationChannel, PushNotificationChannelManager,
 };
 
 #[cfg(feature = "push-notifications")]
-use {
-  windows::Foundation::AsyncStatus,
-  windows::Foundation::IAsyncOperation,
-};
+use {windows::Foundation::AsyncStatus, windows::Foundation::IAsyncOperation};
 
 pub type HWND = isize;
 pub type HMENU = isize;
@@ -471,20 +467,18 @@ pub trait PushNotificationsExtWindows {
         return Err(1);
       }
     };
-    let push_channel_op = match
-      mgr.CreatePushNotificationChannelForApplicationAsync() {
+    let push_channel_op = match mgr.CreatePushNotificationChannelForApplicationAsync() {
       Ok(channel) => channel,
       Err(_) => {
         return Err(2);
       }
     };
     // Attach callback
-    attach_callback(push_channel_op, |result| {
-      match result {
-        Ok(value) => register_push_channel(value),
-        Err(e) => println!("Operation failed with error: {:?}", e),
-      }
-    }).expect("failed to attach callback for windows push notification token");
+    attach_callback(push_channel_op, |result| match result {
+      Ok(value) => register_push_channel(value),
+      Err(e) => println!("Operation failed with error: {:?}", e),
+    })
+    .expect("failed to attach callback for windows push notification token");
 
     Ok(())
   }
@@ -498,30 +492,28 @@ fn register_push_channel(_channel: PushNotificationChannel) {
 #[cfg(feature = "push-notifications")]
 fn attach_callback<T, F>(operation: IAsyncOperation<T>, callback: F) -> windows::core::Result<()>
 where
-    T: windows::core::RuntimeType + 'static,
-    F: FnOnce(windows::core::Result<T>) + Send + Clone + Copy + 'static,
+  T: windows::core::RuntimeType + 'static,
+  F: FnOnce(windows::core::Result<T>) + Send + Clone + Copy + 'static,
 {
   unsafe {
-    operation.SetCompleted(
-      &windows::Foundation::AsyncOperationCompletedHandler::new(
-        move |op, _| {
-          let result = match op.unwrap().Status()? {
-            AsyncStatus::Completed => Ok(op.unwrap().GetResults()),
-            AsyncStatus::Canceled => Err(windows::core::Error:: new::<String>(
-              windows::core::HRESULT(0x800704C7u32 as i32), // Operation canceled
-              "Operation was canceled".into(),
-            )),
-            AsyncStatus::Error => Err(windows::core::Error::new::<String>(
-              op.unwrap().ErrorCode().unwrap(), // Operation failed
-              "Operation failed".into(),
-            )),
-            AsyncStatus::Started => unreachable!(),
-            _ => unreachable!(),
-          };
-          callback(result.expect("empty waiter"));
-          Ok(())
-        },
-      ),
-    )
+    operation.SetCompleted(&windows::Foundation::AsyncOperationCompletedHandler::new(
+      move |op, _| {
+        let result = match op.unwrap().Status()? {
+          AsyncStatus::Completed => Ok(op.unwrap().GetResults()),
+          AsyncStatus::Canceled => Err(windows::core::Error::new::<String>(
+            windows::core::HRESULT(0x800704C7u32 as i32), // Operation canceled
+            "Operation was canceled".into(),
+          )),
+          AsyncStatus::Error => Err(windows::core::Error::new::<String>(
+            op.unwrap().ErrorCode().unwrap(), // Operation failed
+            "Operation failed".into(),
+          )),
+          AsyncStatus::Started => unreachable!(),
+          _ => unreachable!(),
+        };
+        callback(result.expect("empty waiter"));
+        Ok(())
+      },
+    ))
   }
 }

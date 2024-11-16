@@ -40,13 +40,13 @@
 use std::path::PathBuf;
 use std::time::Instant;
 
+use crate::push::PushToken;
 use crate::{
   dpi::{PhysicalPosition, PhysicalSize},
   keyboard::{self, ModifiersState},
   platform_impl,
   window::{Theme, WindowId},
 };
-use crate::push::PushToken;
 
 /// Describes a generic event.
 ///
