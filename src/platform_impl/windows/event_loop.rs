@@ -42,7 +42,6 @@ use windows::{
     },
   },
 };
-
 use crate::{
   dpi::{PhysicalPosition, PhysicalSize, PixelUnit},
   error::ExternalError,
@@ -65,6 +64,11 @@ use crate::{
   window::{Fullscreen, Theme, WindowId as RootWindowId},
 };
 use runner::{EventLoopRunner, EventLoopRunnerShared};
+
+#[cfg(feature = "push-notifications")]
+use {
+  windows::Networking::PushNotifications::PushNotificationChannel,
+};
 
 type GetPointerFrameInfoHistory = unsafe extern "system" fn(
   pointerId: u32,
@@ -144,6 +148,8 @@ pub(crate) struct PlatformSpecificEventLoopAttributes {
   pub(crate) dpi_aware: bool,
   pub(crate) msg_hook: Option<Box<dyn FnMut(*const c_void) -> bool + 'static>>,
   pub(crate) preferred_theme: Option<Theme>,
+  #[cfg(feature = "push-notifications")]
+  pub(crate) push_channel: Option<PushNotificationChannel>,
 }
 
 impl Default for PlatformSpecificEventLoopAttributes {
@@ -153,6 +159,8 @@ impl Default for PlatformSpecificEventLoopAttributes {
       dpi_aware: true,
       msg_hook: None,
       preferred_theme: None,
+      #[cfg(feature = "push-notifications")]
+      push_channel: None,
     }
   }
 }
@@ -163,6 +171,8 @@ pub struct EventLoopWindowTarget<T: 'static> {
   thread_msg_target: HWND,
   pub(crate) preferred_theme: Arc<Mutex<Option<Theme>>>,
   pub(crate) runner_shared: EventLoopRunnerShared<T>,
+  #[cfg(feature = "push-notifications")]
+  pub(crate) push_channel: Arc<Mutex<Option<PushNotificationChannel>>>,
 }
 
 impl<T: 'static> EventLoop<T> {
@@ -203,6 +213,8 @@ impl<T: 'static> EventLoop<T> {
           thread_msg_target,
           runner_shared,
           preferred_theme: Arc::new(Mutex::new(attributes.preferred_theme)),
+          #[cfg(feature = "push-notifications")]
+          push_channel: Arc::new(Mutex::new(None)),
         },
         _marker: PhantomData,
       },
@@ -334,6 +346,15 @@ impl<T> EventLoopWindowTarget<T> {
   #[inline]
   pub fn set_theme(&self, theme: Option<Theme>) {
     *self.preferred_theme.lock() = theme;
+    self.runner_shared.owned_windows(|window| {
+      let _ = unsafe { SendMessageW(window, *CHANGE_THEME_MSG_ID, WPARAM(0), LPARAM(0)) };
+    });
+  }
+
+  #[cfg(feature = "push-notifications")]
+  #[inline]
+  pub fn set_push_channel(&self, channel: Option<PushNotificationChannel>) {
+    *self.push_channel.lock() = channel;
     self.runner_shared.owned_windows(|window| {
       let _ = unsafe { SendMessageW(window, *CHANGE_THEME_MSG_ID, WPARAM(0), LPARAM(0)) };
     });

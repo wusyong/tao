@@ -62,11 +62,13 @@ parking_lot = "0.12"
 unicode-segmentation = "1.11"
 windows-version = "0.1"
 windows-core = "0.58"
+windows-async = "0.1.1"
 
   [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.58"
   features = [
   "implement",
+  "Networking_PushNotifications",
   "Win32_Devices_HumanInterfaceDevice",
   "Win32_Foundation",
   "Win32_Globalization",
