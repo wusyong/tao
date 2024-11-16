@@ -467,14 +467,14 @@ pub trait PushNotificationsExtWindows {
         return Err(1);
       }
     };
-    let push_channel_op = match mgr.CreatePushNotificationChannelForApplicationAsync() {
+    let register_op = match mgr.CreatePushNotificationChannelForApplicationAsync() {
       Ok(channel) => channel,
       Err(_) => {
         return Err(2);
       }
     };
     // Attach callback
-    attach_callback(push_channel_op, |result| match result {
+    attach_callback(register_op, |result| match result {
       Ok(value) => register_push_channel(value),
       Err(e) => println!("Operation failed with error: {:?}", e),
     })

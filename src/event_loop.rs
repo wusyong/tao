@@ -23,6 +23,9 @@ use crate::{
 };
 use std::time::Instant;
 use std::{error, fmt, marker::PhantomData, ops::Deref};
+
+#[cfg(feature = "push-notifications")]
+#[cfg(any(windows))]
 use windows::Networking::PushNotifications::PushNotificationChannel;
 
 /// Provides a way to retrieve events from the system and from the windows that were registered to

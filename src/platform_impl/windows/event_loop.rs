@@ -353,9 +353,6 @@ impl<T> EventLoopWindowTarget<T> {
   #[inline]
   pub fn set_push_channel(&self, channel: Option<PushNotificationChannel>) {
     *self.push_channel.lock() = channel;
-    self.runner_shared.owned_windows(|window| {
-      let _ = unsafe { SendMessageW(window, *CHANGE_THEME_MSG_ID, WPARAM(0), LPARAM(0)) };
-    });
   }
 }
 
