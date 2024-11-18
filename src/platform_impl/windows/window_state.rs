@@ -295,6 +295,17 @@ impl WindowFlags {
     (style, style_ex)
   }
 
+  /// Returns the appropriate window styles for `AdjustWindowRectEx`
+  pub fn to_adjusted_window_styles(self) -> (WINDOW_STYLE, WINDOW_EX_STYLE) {
+    let (mut style, style_ex) = self.to_window_styles();
+
+    if !self.contains(WindowFlags::MARKER_DECORATIONS) {
+      style &= !(WS_CAPTION | WS_THICKFRAME)
+    }
+
+    (style, style_ex)
+  }
+
   /// Adjust the window client rectangle to the return value, if present.
   fn apply_diff(mut self, window: HWND, mut new: WindowFlags) {
     self = self.mask();
