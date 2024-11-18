@@ -20,6 +20,7 @@ pub use crate::platform_impl::EventLoop as UnixEventLoop;
 use crate::{
   error::{ExternalError, OsError},
   event_loop::{EventLoopBuilder, EventLoopWindowTarget},
+  monitor::MonitorHandle,
   platform_impl::{x11::xdisplay::XError, Parent, Window as UnixWindow},
   window::{Window, WindowBuilder},
 };
@@ -281,4 +282,17 @@ unsafe extern "C" fn x_error_callback(
 
   // Fun fact: this return value is completely ignored.
   0
+}
+
+/// Additional methods on `MonitorHandle` that are specific to Unix.
+pub trait MonitorHandleExtUnix {
+  /// Returns the gdk handle of the monitor.
+  fn gdk_monitor(&self) -> &gtk::gdk::Monitor;
+}
+
+impl MonitorHandleExtUnix for MonitorHandle {
+  #[inline]
+  fn gdk_monitor(&self) -> &gtk::gdk::Monitor {
+    &self.inner.monitor
+  }
 }
