@@ -45,7 +45,8 @@ use crate::{
     drop_handler::FileDropHandler,
     event_loop::{self, EventLoopWindowTarget, DESTROY_MSG_ID},
     icon::{self, IconType},
-    monitor, util,
+    monitor::{self},
+    util,
     window_state::{CursorFlags, SavedWindow, WindowFlags, WindowState},
     OsError, Parent, PlatformSpecificWindowBuilderAttributes, WindowId,
   },
@@ -1170,37 +1171,41 @@ unsafe fn init<T: 'static>(
     let (style, ex_style) = window_flags.to_window_styles();
     let title = util::encode_wide(&attributes.title);
 
-    let primary_monitor = event_loop.primary_monitor().map(|m| m.inner);
+    let (target_monitor, position) = attributes
+      .position
+      .and_then(|p| {
+        monitor::available_monitors()
+          .into_iter()
+          .find_map(|monitor| {
+            let position = p.to_physical::<i32>(monitor.scale_factor());
+            let (x, y): (i32, i32) = monitor.position().into();
+            let (width, height): (i32, i32) = monitor.size().into();
 
-    let position = attributes.position.map(|p| {
-      p.to_logical::<f64>(
-        primary_monitor
-          .as_ref()
-          .map(|m| m.scale_factor())
-          .unwrap_or(1.0),
-      )
-    });
-
-    let default_scale_factor = position
-      .and_then(|p| event_loop.monitor_from_point(p.x, p.y))
-      .or_else(|| primary_monitor)
-      .map(|m| m.scale_factor())
-      .unwrap_or(1.0);
+            if x <= position.x
+              && position.x <= x + width
+              && y <= position.y
+              && position.y <= y + height
+            {
+              Some((monitor, position.into()))
+            } else {
+              None
+            }
+          })
+      })
+      .unwrap_or_else(|| (monitor::primary_monitor(), (CW_USEDEFAULT, CW_USEDEFAULT)));
 
     let desired_size = attributes
       .inner_size
       .unwrap_or_else(|| PhysicalSize::new(800, 600).into());
     let clamped_size = attributes
       .inner_size_constraints
-      .clamp(desired_size, default_scale_factor);
-
-    let position = position
-      .map(|p| p.into())
-      .unwrap_or((CW_USEDEFAULT, CW_USEDEFAULT));
+      .clamp(desired_size, target_monitor.scale_factor());
 
     // Best effort: try to create the window with the requested inner size
     let adjusted_size = {
-      let (w, h): (i32, i32) = clamped_size.to_physical::<u32>(default_scale_factor).into();
+      let (w, h): (i32, i32) = clamped_size
+        .to_physical::<u32>(target_monitor.scale_factor())
+        .into();
       let mut rect = RECT {
         left: 0,
         top: 0,
