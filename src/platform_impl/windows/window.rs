@@ -1213,8 +1213,23 @@ unsafe fn init<T: 'static>(
         bottom: h,
       };
       unsafe {
-        AdjustWindowRectEx(&mut rect, style, pl_attribs.menu.is_some(), ex_style)?;
+        AdjustWindowRectEx(
+          &mut rect,
+          window_flags.to_adjusted_window_styles().0,
+          pl_attribs.menu.is_some(),
+          ex_style,
+        )?;
       }
+
+      // account for the 1px we add on each side in WM_NCCALCSIZE
+      // to add shadow for undecorated windows
+      if window_flags.contains(WindowFlags::MARKER_UNDECORATED_SHADOW)
+        && !window_flags.contains(WindowFlags::MARKER_DECORATIONS)
+      {
+        rect.right += 2;
+        rect.bottom += 2;
+      }
+
       (rect.right - rect.left, rect.bottom - rect.top)
     };
 
