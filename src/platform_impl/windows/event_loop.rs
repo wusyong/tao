@@ -2101,6 +2101,7 @@ unsafe fn public_window_callback_inner<T: 'static>(
 
     win32wm::WM_NCCALCSIZE => {
       let window_flags = subclass_input.window_state.lock().window_flags();
+      let is_fullscreen = subclass_input.window_state.lock().fullscreen.is_some();
 
       if wparam == WPARAM(0) || window_flags.contains(WindowFlags::MARKER_DECORATIONS) {
         result = ProcResult::DefSubclassProc;
@@ -2141,7 +2142,7 @@ unsafe fn public_window_callback_inner<T: 'static>(
 
             params.rgrc[0] = rect;
           }
-        } else if window_flags.contains(WindowFlags::MARKER_UNDECORATED_SHADOW) {
+        } else if window_flags.contains(WindowFlags::MARKER_UNDECORATED_SHADOW) && !is_fullscreen {
           let params = &mut *(lparam.0 as *mut NCCALCSIZE_PARAMS);
           params.rgrc[0].top += 1;
           params.rgrc[0].bottom += 1;
