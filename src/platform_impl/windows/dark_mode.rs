@@ -79,9 +79,13 @@ pub fn allow_dark_mode_for_app(is_dark_mode: bool) {
   });
 
   if let Some(ver) = *WIN10_BUILD_VERSION {
+    // in case Windows 10 Build version < 18362, we have to call a special command (_allow_dark_mode_for_app)
     if ver < 18362 {
-      if let Some(_allow_dark_mode_for_app) = *ALLOW_DARK_MODE_FOR_APP {
-        unsafe { _allow_dark_mode_for_app(is_dark_mode) };
+      // but only call that command if the dark mode is supported...
+      if *DARK_MODE_SUPPORTED {
+        if let Some(_allow_dark_mode_for_app) = *ALLOW_DARK_MODE_FOR_APP {
+          unsafe { _allow_dark_mode_for_app(is_dark_mode) };
+        }
       }
     } else if let Some(_set_preferred_app_mode) = *SET_PREFERRED_APP_MODE {
       let mode = if is_dark_mode {
