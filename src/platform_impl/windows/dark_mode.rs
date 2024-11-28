@@ -42,62 +42,60 @@ static DARK_MODE_SUPPORTED: Lazy<bool> = Lazy::new(|| {
 });
 
 pub fn allow_dark_mode_for_app(is_dark_mode: bool) {
-  const UXTHEME_ALLOWDARKMODEFORAPP_ORDINAL: u16 = 135;
-  type AllowDarkModeForApp = unsafe extern "system" fn(bool) -> bool;
-  static ALLOW_DARK_MODE_FOR_APP: Lazy<Option<AllowDarkModeForApp>> = Lazy::new(|| unsafe {
-    if HMODULE(*HUXTHEME as _).is_invalid() {
-      return None;
+  if *DARK_MODE_SUPPORTED {
+    const UXTHEME_ALLOWDARKMODEFORAPP_ORDINAL: u16 = 135;
+    type AllowDarkModeForApp = unsafe extern "system" fn(bool) -> bool;
+    static ALLOW_DARK_MODE_FOR_APP: Lazy<Option<AllowDarkModeForApp>> = Lazy::new(|| unsafe {
+      if HMODULE(*HUXTHEME as _).is_invalid() {
+        return None;
+      }
+
+      GetProcAddress(
+        HMODULE(*HUXTHEME as _),
+        PCSTR::from_raw(UXTHEME_ALLOWDARKMODEFORAPP_ORDINAL as usize as *mut _),
+      )
+      .map(|handle| std::mem::transmute(handle))
+    });
+
+    #[repr(C)]
+    enum PreferredAppMode {
+      Default,
+      AllowDark,
+      // ForceDark,
+      // ForceLight,
+      // Max,
     }
+    const UXTHEME_SETPREFERREDAPPMODE_ORDINAL: u16 = 135;
+    type SetPreferredAppMode = unsafe extern "system" fn(PreferredAppMode) -> PreferredAppMode;
+    static SET_PREFERRED_APP_MODE: Lazy<Option<SetPreferredAppMode>> = Lazy::new(|| unsafe {
+      if HMODULE(*HUXTHEME as _).is_invalid() {
+        return None;
+      }
 
-    GetProcAddress(
-      HMODULE(*HUXTHEME as _),
-      PCSTR::from_raw(UXTHEME_ALLOWDARKMODEFORAPP_ORDINAL as usize as *mut _),
-    )
-    .map(|handle| std::mem::transmute(handle))
-  });
+      GetProcAddress(
+        HMODULE(*HUXTHEME as _),
+        PCSTR::from_raw(UXTHEME_SETPREFERREDAPPMODE_ORDINAL as usize as *mut _),
+      )
+      .map(|handle| std::mem::transmute(handle))
+    });
 
-  #[repr(C)]
-  enum PreferredAppMode {
-    Default,
-    AllowDark,
-    // ForceDark,
-    // ForceLight,
-    // Max,
-  }
-  const UXTHEME_SETPREFERREDAPPMODE_ORDINAL: u16 = 135;
-  type SetPreferredAppMode = unsafe extern "system" fn(PreferredAppMode) -> PreferredAppMode;
-  static SET_PREFERRED_APP_MODE: Lazy<Option<SetPreferredAppMode>> = Lazy::new(|| unsafe {
-    if HMODULE(*HUXTHEME as _).is_invalid() {
-      return None;
-    }
-
-    GetProcAddress(
-      HMODULE(*HUXTHEME as _),
-      PCSTR::from_raw(UXTHEME_SETPREFERREDAPPMODE_ORDINAL as usize as *mut _),
-    )
-    .map(|handle| std::mem::transmute(handle))
-  });
-
-  if let Some(ver) = *WIN10_BUILD_VERSION {
-    // in case Windows 10 Build version < 18362, we have to call a special command (_allow_dark_mode_for_app)
-    if ver < 18362 {
-        // but only call that command if the dark mode is supported...
-        if *DARK_MODE_SUPPORTED {
-            if let Some(_allow_dark_mode_for_app) = *ALLOW_DARK_MODE_FOR_APP {
-                unsafe { _allow_dark_mode_for_app(is_dark_mode) };
-            }
+    if let Some(ver) = *WIN10_BUILD_VERSION {
+      if ver < 18362 {
+        if let Some(_allow_dark_mode_for_app) = *ALLOW_DARK_MODE_FOR_APP {
+          unsafe { _allow_dark_mode_for_app(is_dark_mode) };
         }
-    } else if let Some(_set_preferred_app_mode) = *SET_PREFERRED_APP_MODE {
-      let mode = if is_dark_mode {
-        PreferredAppMode::AllowDark
-      } else {
-        PreferredAppMode::Default
-      };
-      unsafe { _set_preferred_app_mode(mode) };
+      } else if let Some(_set_preferred_app_mode) = *SET_PREFERRED_APP_MODE {
+        let mode = if is_dark_mode {
+          PreferredAppMode::AllowDark
+        } else {
+          PreferredAppMode::Default
+        };
+        unsafe { _set_preferred_app_mode(mode) };
+      }
     }
-  }
 
-  refresh_immersive_color_policy_state();
+    refresh_immersive_color_policy_state();
+  }
 }
 
 fn refresh_immersive_color_policy_state() {
