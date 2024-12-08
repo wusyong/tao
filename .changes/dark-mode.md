@@ -2,4 +2,4 @@
 "tao": "patch"
 ---
 
-Windows: Executing the function allow_dark_mode_for_app only if darkmode is supported.
+On Windows, fix crash on older windows versions that doesn't support dark mode.
