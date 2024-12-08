@@ -1,5 +1,14 @@
 # Changelog
 
+## \[0.31.0]
+
+- [`5d6d7da0`](https://github.com/tauri-apps/tao/commit/5d6d7da0ade44e08b33496bf445afb69a09037f0) ([#1017](https://github.com/tauri-apps/tao/pull/1017) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix regression caused undecorated window with shadows to be slightly larger on creation.
+- [`2e6cf1a4`](https://github.com/tauri-apps/tao/commit/2e6cf1a4332093806a5d277098b6573299256622) ([#1022](https://github.com/tauri-apps/tao/pull/1022) by [@Jnschrber](https://github.com/tauri-apps/tao/../../Jnschrber)) On Windows, fix crash on older windows versions that doesn't support dark mode.
+- [`6b49f55a`](https://github.com/tauri-apps/tao/commit/6b49f55a96ac47d0e645a04c7e4fabe4dd063196) ([#1016](https://github.com/tauri-apps/tao/pull/1016) by [@Legend-Master](https://github.com/tauri-apps/tao/../../Legend-Master)) Expose raw gdk monitor through `MonitorHandleExtUnix::gdk_monitor`
+- [`720bd93f`](https://github.com/tauri-apps/tao/commit/720bd93f9798e5fa2a8adc2c93dde2ce3c2c9700) ([#1018](https://github.com/tauri-apps/tao/pull/1018) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix regression in initial window position when using logical positions.
+- [`73741a75`](https://github.com/tauri-apps/tao/commit/73741a75409a93267947d92697616437ae4fccb8) ([#1008](https://github.com/tauri-apps/tao/pull/1008) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) Remove `instant` dependency, changed `StartCause::ResumeTimeReached`, `StartCause::WaitCancelled` and `ControlFlow::WaitUntil` to use `std::time::Instant` instead.
+- [`fa9aaa60`](https://github.com/tauri-apps/tao/commit/fa9aaa6066dcc0316d57038fc1b1e3353dc5c3e7) ([#1019](https://github.com/tauri-apps/tao/pull/1019) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix fullscreen for undecorated window have white borders.
+
 ## \[0.30.7]
 
 - [`97382238`](https://github.com/tauri-apps/tao/commit/97382238b218d66baf5693b6087b7bef2e66ec70) ([#1007](https://github.com/tauri-apps/tao/pull/1007) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix `Window::set_inner_size` regression not handling borders correctly for undecorated window with shadows.
