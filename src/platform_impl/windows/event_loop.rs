@@ -6,8 +6,30 @@
 
 mod runner;
 
+use crate::{
+  dpi::{PhysicalPosition, PhysicalSize, PixelUnit},
+  error::ExternalError,
+  event::{DeviceEvent, Event, Force, RawKeyEvent, Touch, TouchPhase, WindowEvent},
+  event_loop::{ControlFlow, DeviceEventFilter, EventLoopClosed, EventLoopWindowTarget as RootELW},
+  keyboard::{KeyCode, ModifiersState},
+  monitor::MonitorHandle as RootMonitorHandle,
+  platform_impl::platform::{
+    dark_mode::try_window_theme,
+    dpi::{become_dpi_aware, dpi_to_scale_factor, enable_non_client_dpi_scaling},
+    keyboard::is_msg_keyboard_related,
+    keyboard_layout::LAYOUT_CACHE,
+    minimal_ime::is_msg_ime_related,
+    monitor::{self, MonitorHandle},
+    raw_input, util,
+    window::set_skip_taskbar,
+    window_state::{CursorFlags, WindowFlags, WindowState},
+    wrap_device_id, WindowId, DEVICE_ID,
+  },
+  window::{Fullscreen, Theme, WindowId as RootWindowId},
+};
 use crossbeam_channel::{self as channel, Receiver, Sender};
 use parking_lot::Mutex;
+use runner::{EventLoopRunner, EventLoopRunnerShared};
 use std::{
   cell::Cell,
   collections::VecDeque,
@@ -43,28 +65,8 @@ use windows::{
   },
 };
 
-use crate::{
-  dpi::{PhysicalPosition, PhysicalSize, PixelUnit},
-  error::ExternalError,
-  event::{DeviceEvent, Event, Force, RawKeyEvent, Touch, TouchPhase, WindowEvent},
-  event_loop::{ControlFlow, DeviceEventFilter, EventLoopClosed, EventLoopWindowTarget as RootELW},
-  keyboard::{KeyCode, ModifiersState},
-  monitor::MonitorHandle as RootMonitorHandle,
-  platform_impl::platform::{
-    dark_mode::try_window_theme,
-    dpi::{become_dpi_aware, dpi_to_scale_factor, enable_non_client_dpi_scaling},
-    keyboard::is_msg_keyboard_related,
-    keyboard_layout::LAYOUT_CACHE,
-    minimal_ime::is_msg_ime_related,
-    monitor::{self, MonitorHandle},
-    raw_input, util,
-    window::set_skip_taskbar,
-    window_state::{CursorFlags, WindowFlags, WindowState},
-    wrap_device_id, WindowId, DEVICE_ID,
-  },
-  window::{Fullscreen, Theme, WindowId as RootWindowId},
-};
-use runner::{EventLoopRunner, EventLoopRunnerShared};
+#[cfg(feature = "push-notifications")]
+use windows::Networking::PushNotifications::PushNotificationChannel;
 
 type GetPointerFrameInfoHistory = unsafe extern "system" fn(
   pointerId: u32,
@@ -144,6 +146,8 @@ pub(crate) struct PlatformSpecificEventLoopAttributes {
   pub(crate) dpi_aware: bool,
   pub(crate) msg_hook: Option<Box<dyn FnMut(*const c_void) -> bool + 'static>>,
   pub(crate) preferred_theme: Option<Theme>,
+  #[cfg(feature = "push-notifications")]
+  pub(crate) push_channel: Option<PushNotificationChannel>,
 }
 
 impl Default for PlatformSpecificEventLoopAttributes {
@@ -153,6 +157,8 @@ impl Default for PlatformSpecificEventLoopAttributes {
       dpi_aware: true,
       msg_hook: None,
       preferred_theme: None,
+      #[cfg(feature = "push-notifications")]
+      push_channel: None,
     }
   }
 }
@@ -163,6 +169,8 @@ pub struct EventLoopWindowTarget<T: 'static> {
   thread_msg_target: HWND,
   pub(crate) preferred_theme: Arc<Mutex<Option<Theme>>>,
   pub(crate) runner_shared: EventLoopRunnerShared<T>,
+  #[cfg(feature = "push-notifications")]
+  pub(crate) push_channel: Arc<Mutex<Option<PushNotificationChannel>>>,
 }
 
 impl<T: 'static> EventLoop<T> {
@@ -203,6 +211,8 @@ impl<T: 'static> EventLoop<T> {
           thread_msg_target,
           runner_shared,
           preferred_theme: Arc::new(Mutex::new(attributes.preferred_theme)),
+          #[cfg(feature = "push-notifications")]
+          push_channel: Arc::new(Mutex::new(None)),
         },
         _marker: PhantomData,
       },
@@ -337,6 +347,12 @@ impl<T> EventLoopWindowTarget<T> {
     self.runner_shared.owned_windows(|window| {
       let _ = unsafe { SendMessageW(window, *CHANGE_THEME_MSG_ID, WPARAM(0), LPARAM(0)) };
     });
+  }
+
+  #[cfg(feature = "push-notifications")]
+  #[inline]
+  pub fn set_push_channel(&self, channel: Option<PushNotificationChannel>) {
+    *self.push_channel.lock() = channel;
   }
 }
 

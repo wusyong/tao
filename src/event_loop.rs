@@ -13,9 +13,6 @@
 //! [create_proxy]: crate::event_loop::EventLoop::create_proxy
 //! [event_loop_proxy]: crate::event_loop::EventLoopProxy
 //! [send_event]: crate::event_loop::EventLoopProxy::send_event
-use std::time::Instant;
-use std::{error, fmt, marker::PhantomData, ops::Deref};
-
 use crate::{
   dpi::PhysicalPosition,
   error::ExternalError,
@@ -24,6 +21,12 @@ use crate::{
   platform_impl,
   window::{ProgressBarState, Theme},
 };
+use std::time::Instant;
+use std::{error, fmt, marker::PhantomData, ops::Deref};
+
+#[cfg(feature = "push-notifications")]
+#[cfg(any(windows))]
+use windows::Networking::PushNotifications::PushNotificationChannel;
 
 /// Provides a way to retrieve events from the system and from the windows that were registered to
 /// the events loop.
@@ -318,6 +321,18 @@ impl<T> EventLoopWindowTarget<T> {
       target_os = "macos",
     ))]
     self.p.set_theme(theme)
+  }
+
+  /// Sets the push channel for the application.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Windows only.** Other platforms deliver the push channel or token via other means.
+  #[cfg(any(windows))]
+  #[cfg(feature = "push-notifications")]
+  #[inline]
+  pub fn set_push_channel(&self, channel: Option<PushNotificationChannel>) {
+    self.p.set_push_channel(channel)
   }
 }
 

@@ -17,6 +17,14 @@ use crate::{
 };
 use windows::Win32::UI::Input::KeyboardAndMouse::*;
 
+#[cfg(feature = "push-notifications")]
+use windows::Networking::PushNotifications::{
+  PushNotificationChannel, PushNotificationChannelManager,
+};
+
+#[cfg(feature = "push-notifications")]
+use {windows::Foundation::AsyncStatus, windows::Foundation::IAsyncOperation};
+
 pub type HWND = isize;
 pub type HMENU = isize;
 
@@ -438,5 +446,74 @@ impl IconExtWindows for Icon {
   fn from_resource(ordinal: u16, size: Option<PhysicalSize<u32>>) -> Result<Self, BadIcon> {
     let win_icon = WinIcon::from_resource(ordinal, size)?;
     Ok(Icon { inner: win_icon })
+  }
+}
+
+/// Additional methods on `PushNotifications` that are specific to Windows.
+#[cfg(feature = "push-notifications")]
+pub trait PushNotificationsExtWindows {
+  /// Setup Windows Notifications System, the Windows equivalent to APNS.
+  ///
+  /// This call yields an `IAsyncOperation` which must be awaited to obtain the underlying
+  /// `PushNotificationChannel`.
+  ///
+  /// Return error codes are documented below:
+  /// (None yet).
+  fn setup_wns() -> Result<(), u8> {
+    let mgr = PushNotificationChannelManager::GetDefault();
+    let mgr = match mgr {
+      Ok(mgr) => mgr,
+      Err(_) => {
+        return Err(1);
+      }
+    };
+    let register_op = match mgr.CreatePushNotificationChannelForApplicationAsync() {
+      Ok(channel) => channel,
+      Err(_) => {
+        return Err(2);
+      }
+    };
+    // Attach callback
+    attach_callback(register_op, |result| match result {
+      Ok(value) => register_push_channel(value),
+      Err(e) => println!("Operation failed with error: {:?}", e),
+    })
+    .expect("failed to attach callback for windows push notification token");
+
+    Ok(())
+  }
+}
+
+#[cfg(feature = "push-notifications")]
+fn register_push_channel(_channel: PushNotificationChannel) {
+  eprintln!("would register channel")
+}
+
+#[cfg(feature = "push-notifications")]
+fn attach_callback<T, F>(operation: IAsyncOperation<T>, callback: F) -> windows::core::Result<()>
+where
+  T: windows::core::RuntimeType + 'static,
+  F: FnOnce(windows::core::Result<T>) + Send + Clone + Copy + 'static,
+{
+  unsafe {
+    operation.SetCompleted(&windows::Foundation::AsyncOperationCompletedHandler::new(
+      move |op, _| {
+        let result = match op.unwrap().Status()? {
+          AsyncStatus::Completed => Ok(op.unwrap().GetResults()),
+          AsyncStatus::Canceled => Err(windows::core::Error::new::<String>(
+            windows::core::HRESULT(0x800704C7u32 as i32), // Operation canceled
+            "Operation was canceled".into(),
+          )),
+          AsyncStatus::Error => Err(windows::core::Error::new::<String>(
+            op.unwrap().ErrorCode().unwrap(), // Operation failed
+            "Operation failed".into(),
+          )),
+          AsyncStatus::Started => unreachable!(),
+          _ => unreachable!(),
+        };
+        callback(result.expect("empty waiter"));
+        Ok(())
+      },
+    ))
   }
 }

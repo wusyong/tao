@@ -416,6 +416,16 @@ impl AppState {
       (_, ControlFlow::Poll) => HANDLER.waker().start(),
     }
   }
+
+  pub fn did_register_push_token(token_data: Vec<u8>) {
+    HANDLER.handle_nonuser_event(EventWrapper::StaticEvent(Event::PushRegistration(
+      token_data,
+    )));
+  }
+
+  pub fn did_fail_to_register_push_token(err: String) {
+    HANDLER.handle_nonuser_event(EventWrapper::StaticEvent(Event::PushRegistrationError(err)));
+  }
 }
 
 /// A hack to make activation of multiple windows work when creating them before
