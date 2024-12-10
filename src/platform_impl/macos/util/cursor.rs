@@ -107,7 +107,7 @@ impl Cursor {
 // Note that loading `busybutclickable` with this code won't animate the frames;
 // instead you'll just get them all in a column.
 pub unsafe fn load_webkit_cursor(cursor_name: &str) -> id {
-  static CURSOR_ROOT: &str = "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/Resources/cursors";
+  const CURSOR_ROOT: &str = "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/Resources/cursors";
   let cursor_root = NSString::alloc(nil).init_str(CURSOR_ROOT);
   let cursor_name = NSString::alloc(nil).init_str(cursor_name);
   let cursor_pdf = NSString::alloc(nil).init_str("cursor.pdf");
@@ -135,7 +135,7 @@ pub unsafe fn invisible_cursor() -> id {
   // 16x16 GIF data for invisible cursor
   // You can reproduce this via ImageMagick.
   // $ convert -size 16x16 xc:none cursor.gif
-  static CURSOR_BYTES: &[u8] = &[
+  const CURSOR_BYTES: &[u8] = &[
     0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x10, 0x00, 0x10, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x21, 0xF9, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x2C, 0x00, 0x00, 0x00, 0x00,
     0x10, 0x00, 0x10, 0x00, 0x00, 0x02, 0x0E, 0x84, 0x8F, 0xA9, 0xCB, 0xED, 0x0F, 0xA3, 0x9C, 0xB4,

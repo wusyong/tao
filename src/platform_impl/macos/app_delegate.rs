@@ -20,7 +20,7 @@ use std::{
 use cocoa::foundation::{NSArray, NSURL};
 use std::ffi::CStr;
 
-static AUX_DELEGATE_STATE_NAME: &str = "auxState";
+const AUX_DELEGATE_STATE_NAME: &str = "auxState";
 
 pub struct AuxDelegateState {
   /// We store this value in order to be able to defer setting the activation policy until
