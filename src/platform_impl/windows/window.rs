@@ -287,7 +287,7 @@ impl Window {
   #[inline]
   pub fn set_inner_size(&self, size: Size) {
     let scale_factor = self.scale_factor();
-    let (mut width, mut height) = size.to_physical::<i32>(scale_factor).into();
+    let (mut desired_width, mut desired_height) = size.to_physical::<i32>(scale_factor).into();
 
     let window_state = Arc::clone(&self.window_state);
 
@@ -300,13 +300,19 @@ impl Window {
       if unsafe { ClientToScreen(self.hwnd(), &mut pt) }.as_bool() == true {
         let mut window_rc: RECT = unsafe { mem::zeroed() };
         if unsafe { GetWindowRect(self.hwnd(), &mut window_rc) }.is_ok() {
-          let left_b = pt.x - window_rc.left;
-          let right_b = pt.x + width - window_rc.right;
-          let top_b = pt.y - window_rc.top;
-          let bottom_b = pt.y + height - window_rc.bottom;
+          let mut client_rc: RECT = unsafe { mem::zeroed() };
+          if unsafe { GetClientRect(self.hwnd(), &mut client_rc) }.is_ok() {
+            let curr_width = client_rc.right - client_rc.left;
+            let curr_height = client_rc.bottom - client_rc.top;
 
-          width = width + (left_b - right_b);
-          height = height + (top_b - bottom_b);
+            let left_b = pt.x - window_rc.left;
+            let right_b: i32 = (pt.x + curr_width) - window_rc.right;
+            let top_b = pt.y - window_rc.top;
+            let bottom_b: i32 = (pt.y + curr_height) - window_rc.bottom;
+
+            desired_width = desired_width + left_b + right_b.abs();
+            desired_height = desired_height + top_b + bottom_b.abs();
+          }
         }
       }
     }
@@ -318,7 +324,7 @@ impl Window {
       });
     });
 
-    util::set_inner_size_physical(self.window.0, width, height, is_decorated);
+    util::set_inner_size_physical(self.window.0, desired_width, desired_height, is_decorated);
   }
 
   #[inline]
