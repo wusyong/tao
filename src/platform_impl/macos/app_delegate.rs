@@ -44,6 +44,11 @@ lazy_static! {
     decl.add_method(sel!(dealloc), dealloc as extern "C" fn(&Object, Sel));
 
     decl.add_method(
+      sel!(applicationWillFinishLaunching:),
+      will_finish_launching as extern "C" fn(&Object, Sel, id),
+    );
+
+    decl.add_method(
       sel!(applicationDidFinishLaunching:),
       did_finish_launching as extern "C" fn(&Object, Sel, id),
     );
@@ -98,6 +103,12 @@ extern "C" fn dealloc(this: &Object, _: Sel) {
     // memory
     drop(Box::from_raw(state_ptr as *mut RefCell<AuxDelegateState>));
   }
+}
+
+extern "C" fn will_finish_launching(this: &Object, _: Sel, _: id) {
+  trace!("Triggered `applicationWillFinishLaunching`");
+  AppState::will_launch(this);
+  trace!("Completed `applicationWillFinishLaunching`");
 }
 
 extern "C" fn did_finish_launching(this: &Object, _: Sel, _: id) {
