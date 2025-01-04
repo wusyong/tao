@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.31.1]
+
+- [`83e35e96`](https://github.com/tauri-apps/tao/commit/83e35e961f4893790b913ee2efc15ae33fd16fb2) ([#1036](https://github.com/tauri-apps/tao/pull/1036) by [@FabioGNR](https://github.com/tauri-apps/tao/../../FabioGNR)) Call `gtk::init` when creating the eventloop to fix crashes with some gtk APIs.
+- [`bb537fe9`](https://github.com/tauri-apps/tao/commit/bb537fe9969e490b74548738f16173d5b9d84c63) ([#1039](https://github.com/tauri-apps/tao/pull/1039) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix regression that caused `Window::set_size` to have no effect at all for undecorated window with shadows.
+
 ## \[0.31.0]
 
 - [`5d6d7da0`](https://github.com/tauri-apps/tao/commit/5d6d7da0ade44e08b33496bf445afb69a09037f0) ([#1017](https://github.com/tauri-apps/tao/pull/1017) by [@amrbashir](https://github.com/tauri-apps/tao/../../amrbashir)) On Windows, fix regression caused undecorated window with shadows to be slightly larger on creation.
