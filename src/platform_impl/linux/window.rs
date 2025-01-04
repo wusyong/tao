@@ -93,9 +93,15 @@ impl Window {
     }
 
     let window = window_builder.build();
+    let win_scale_factor = window.scale_factor();
+    let min_inner_size = attributes
+      .inner_size_constraints
+      .min_size_physical::<i32>(win_scale_factor as f64);
+    let min_width = min_inner_size.width.max(1);
+    let min_height = min_inner_size.height.max(1);
 
     if is_wayland {
-      WlHeader::setup(&window, &attributes.title);
+      WlHeader::setup(&window, &attributes.title, min_width);
     }
 
     let window_id = WindowId(window.id());
@@ -105,13 +111,17 @@ impl Window {
       .insert(window_id);
 
     // Set Width/Height & Resizable
-    let win_scale_factor = window.scale_factor();
     let (width, height) = attributes
       .inner_size
       .map(|size| size.to_logical::<f64>(win_scale_factor as f64).into())
       .unwrap_or((800, 600));
-    window.set_default_size(1, 1);
-    window.resize(width, height);
+
+    let window_clone = window.clone();
+    glib::idle_add_local_full(glib::Priority::HIGH_IDLE, move || {
+      window_clone.set_default_size(min_width, min_height);
+      window_clone.resize(width, height);
+      glib::ControlFlow::Break
+    });
 
     if attributes.maximized {
       let maximize_process = util::WindowMaximizeProcess::new(window.clone(), attributes.resizable);
@@ -127,6 +137,15 @@ impl Window {
 
     // Set Min/Max Size
     util::set_size_constraints(&window, attributes.inner_size_constraints);
+
+    let default_vbox = if pl_attribs.default_vbox {
+      let box_ = gtk::Box::new(gtk::Orientation::Vertical, 0);
+      box_.set_size_request(min_width, min_height);
+      window.add(&box_);
+      Some(box_)
+    } else {
+      None
+    };
 
     // Set Position
     if let Some(position) = attributes.position {
@@ -158,14 +177,6 @@ impl Window {
         }
       }
     }
-
-    let default_vbox = if pl_attribs.default_vbox {
-      let box_ = gtk::Box::new(gtk::Orientation::Vertical, 0);
-      window.add(&box_);
-      Some(box_)
-    } else {
-      None
-    };
 
     // Rest attributes
     window.set_title(&attributes.title);

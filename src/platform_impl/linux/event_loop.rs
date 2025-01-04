@@ -605,7 +605,13 @@ impl<T: 'static> EventLoop<T> {
                 log::warn!("Failed to send window moved event to event channel: {}", e);
               }
 
-              let (w, h) = event.size();
+              let (w, h) = if let Some(child) = window.child() {
+                let allocation = child.allocation();
+                (allocation.width() as u32, allocation.height() as u32)
+              } else {
+                event.size()
+              };
+
               if let Err(e) = tx_clone.send(Event::WindowEvent {
                 window_id: RootWindowId(id),
                 event: WindowEvent::Resized(
