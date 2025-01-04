@@ -17,6 +17,7 @@ Run the `cargo run --example <file_name>` to see how each example works.
 - `cursor_grab`: prevent the cursor from going outside the window.
 - `cursor`: set different cursor icons.
 - `drag_window`: allow dragging window when hold left mouse and move.
+- `exit_requested_event`: handle for dock icon exit on macOS.
 - `min_max_size`: set smallest/largest window size you can zoom.
 - `minimize`: minimize window.
 - `monitor_list`: list all available monitors.

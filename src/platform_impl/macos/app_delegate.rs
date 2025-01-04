@@ -19,8 +19,11 @@ use std::{
 
 use cocoa::foundation::{NSArray, NSURL};
 use std::ffi::CStr;
+use std::os::raw::c_int;
 
 static AUX_DELEGATE_STATE_NAME: &str = "auxState";
+
+const NS_TERMINATE_LATER: c_int = 2;
 
 pub struct AuxDelegateState {
   /// We store this value in order to be able to defer setting the activation policy until
@@ -46,6 +49,10 @@ lazy_static! {
     decl.add_method(
       sel!(applicationDidFinishLaunching:),
       did_finish_launching as extern "C" fn(&Object, Sel, id),
+    );
+    decl.add_method(
+      sel!(applicationShouldTerminate:),
+      application_should_terminate as extern "C" fn(&Object, Sel, id) -> c_int,
     );
     decl.add_method(
       sel!(applicationWillTerminate:),
@@ -104,6 +111,13 @@ extern "C" fn did_finish_launching(this: &Object, _: Sel, _: id) {
   trace!("Triggered `applicationDidFinishLaunching`");
   AppState::launched(this);
   trace!("Completed `applicationDidFinishLaunching`");
+}
+
+extern "C" fn application_should_terminate(_: &Object, _: Sel, _: id) -> c_int {
+  trace!("Triggered `applicationShouldTerminate`");
+  AppState::should_exit();
+  trace!("Completed `applicationShouldTerminate`");
+  NS_TERMINATE_LATER
 }
 
 extern "C" fn application_will_terminate(_: &Object, _: Sel, _: id) {

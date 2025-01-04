@@ -270,6 +270,10 @@ impl AppState {
     }));
   }
 
+  pub fn should_exit() {
+    HANDLER.handle_nonuser_event(EventWrapper::StaticEvent(Event::ExitRequested));
+  }
+
   pub fn exit() -> i32 {
     HANDLER.set_in_callback(true);
     HANDLER.handle_nonuser_event(EventWrapper::StaticEvent(Event::LoopDestroyed));

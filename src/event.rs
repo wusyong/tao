@@ -143,6 +143,13 @@ pub enum Event<'a, T: 'static> {
   /// - **Other**: Unsupported.
   #[non_exhaustive]
   Reopen { has_visible_windows: bool },
+
+  /// The MacOS dock has requested to quit the application.
+  ///
+  /// ## Platform-specific
+  /// - **macOS**: https://developer.apple.com/documentation/appkit/nsapplicationdelegate/1428642-applicationshouldterminate
+  /// - **Other**: Unsupported.
+  ExitRequested,
 }
 
 impl<T: Clone> Clone for Event<'static, T> {
@@ -171,6 +178,7 @@ impl<T: Clone> Clone for Event<'static, T> {
       } => Reopen {
         has_visible_windows: *has_visible_windows,
       },
+      ExitRequested => ExitRequested,
     }
   }
 }
@@ -195,6 +203,7 @@ impl<'a, T> Event<'a, T> {
       } => Ok(Reopen {
         has_visible_windows,
       }),
+      ExitRequested => Ok(ExitRequested),
     }
   }
 
@@ -221,6 +230,7 @@ impl<'a, T> Event<'a, T> {
       } => Some(Reopen {
         has_visible_windows,
       }),
+      ExitRequested => Some(ExitRequested),
     }
   }
 }
