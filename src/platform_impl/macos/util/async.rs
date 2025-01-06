@@ -10,7 +10,7 @@ use std::{
 use cocoa::{
   appkit::{CGFloat, NSScreen, NSWindow, NSWindowStyleMask},
   base::{id, nil},
-  foundation::{NSPoint, NSSize, NSString},
+  foundation::{NSPoint, NSRect, NSSize, NSString},
 };
 use dispatch::Queue;
 use objc::{
@@ -184,8 +184,20 @@ pub unsafe fn set_maximized_async(
       } else {
         // if it's not resizable, we set the frame directly
         let new_rect = if maximized {
+          let max_size = ns_window.maxSize();
           let screen = NSScreen::mainScreen(nil);
-          NSScreen::visibleFrame(screen)
+          let screen_rect = NSScreen::visibleFrame(screen);
+          let width = if max_size.width < screen_rect.size.width {
+            max_size.width
+          } else {
+            screen_rect.size.width
+          };
+          let height = if max_size.height < screen_rect.size.height {
+            max_size.height
+          } else {
+            screen_rect.size.height
+          };
+          NSRect::new(screen_rect.origin, NSSize::new(width, height))
         } else {
           shared_state_lock.saved_standard_frame()
         };
