@@ -689,7 +689,7 @@ impl UnownedWindow {
     let scale_factor = self.scale_factor();
     let position = position.to_logical(scale_factor);
     unsafe {
-      util::set_frame_top_left_point_async(*self.ns_window, util::window_position(position));
+      util::set_frame_top_left_point_sync(*self.ns_window, util::window_position(position));
     }
   }
 
@@ -715,7 +715,7 @@ impl UnownedWindow {
   pub fn set_inner_size(&self, size: Size) {
     unsafe {
       let scale_factor = self.scale_factor();
-      util::set_content_size_async(*self.ns_window, size.to_logical(scale_factor));
+      util::set_content_size_sync(*self.ns_window, size.to_logical(scale_factor));
     }
   }
 
